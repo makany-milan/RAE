@@ -122,41 +122,60 @@ save "formatted/wos_econlit.dta", replace
 clear
 use "formatted/openalex_journals_data.dta"
 gen econ_journal = 0
-merge 1:1 issn using "formatted/wos_econlit.dta" // 650 matches
+merge 1:1 issn using "formatted/wos_econlit.dta", update // 650 matches
 drop if _merge == 2
 replace econ_journal = 1 if _merge == 3
 drop _merge
-merge 1:1 eissn using "formatted/wos_econlit.dta" // 242 matches
+merge 1:1 eissn using "formatted/wos_econlit.dta", update // 9 matches
 drop if _merge == 2
+replace econ_journal = 1 if _merge == 3
 drop _merge
+
 
 * Check for cross matches between ISSN and EISSN - Data sources might
 * incorrectly store values
-rename issn issn_
+rename issn temp
 rename eissn issn
-merge 1:1 issn using "formatted/wos_econlit.dta" //  648 matches
-* Remove brouught over variable
+merge 1:1 issn using "formatted/wos_econlit.dta", update //  629 matches
+* Remove brought over variable
 drop eissn
 drop if _merge == 2
 replace econ_journal = 1 if _merge == 3
 drop _merge
+* redo renaming
+rename issn eissn
+rename temp issn
 
-rename issn eissn_
-rename issn_ eissn
-merge 1:1 eissn using "formatted/wos_econlit.dta" // 275 matches
-* Remove brouught over variable
+
+rename eissn temp
+rename issn eissn
+merge 1:1 eissn using "formatted/wos_econlit.dta", update // 275 matches
+* Remove brought over variable
 drop issn
 drop if _merge == 2
 replace econ_journal = 1 if _merge == 3
 drop _merge
-
+* redo renaming
 rename eissn issn
-rename eissn_ eissn
+rename temp eissn
 
 
 * !!! TODO
 * Merge EconLit & WOS to OpenAlex based on journal name
 
+* Mark as economics journals based on journal name
+replace econ_journal = 1 if strpos(lower(journal_name), "economics")
+replace econ_journal = 1 if strpos(lower(journal_name), "econometrics")
+replace econ_journal = 1 if strpos(lower(journal_name), "economy")
+replace econ_journal = 1 if strpos(lower(journal_name), "economic")
+
+replace econ_journal = 1 if strpos(lower(journal_name), "economics")
+replace econ_journal = 1 if strpos(lower(journal_name), "econometrics")
+replace econ_journal = 1 if strpos(lower(journal_name), "economy")
+replace econ_journal = 1 if strpos(lower(journal_name), "economic")
+
+
+save "formatted/all_journals.dta", replace
 
 * Save merged Economics journals
 keep if econ_journal == 1 // 1287 journals matched

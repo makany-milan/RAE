@@ -14,15 +14,11 @@ set varabbrev off
 
 * Procedure Outline
 * 1) Collect data from OpenAlex
-*		This step was performed in python. The stata integration of python is a 
-*		bit unreliable and OS dependent.
-
 
 * 2) Filter authors based on publications in economics journals
 *		Use a list of economics journals from Web of Science (WOS) and EconLit
 *		Merge to OpenAlex data based on ISSN number where available, otherwise
 *		based on the name of the journal.
-
 
 * 3) Construct a panel data of publications and affiliations on authors that
 *	 publish in the field of economics.
@@ -33,7 +29,8 @@ global scripts_folder = "C:\Users\u2048873\RAE"
 global data_folder = "C:\Users\u2048873\rae_data"
 
 * 1) Collect data from OpenAlex
-
+*		This step was performed in python. The stata integration of python is a 
+*		bit unreliable and OS dependent.
 
 * 2) Filter authors based on publications in economics journals
 * Import and merge journal data from OpenAlex, WOS, and Econlit
