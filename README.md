@@ -14,7 +14,7 @@ The codes in the repository are used by the author to extract, process, and anal
 | [OpenAlex](https://openalex.org/) | OpenAlex is a free and open catalog of the world's scholarly papers, researchers, journals, and institutions — along with all the ways they're connected to one another.|
 | [Web of Science](https://mjl.clarivate.com/collection-list-downloads) | The Master Journal List is an invaluable tool to help you to find the right journal for your needs across multiple indices hosted on the Web of Science platform.|
 | [EconLit](https://www.aeaweb.org/econlit/journal_list.php) | EconLit provides the coverage most needed by scholars to make new discoveries, develop important insights, and contribute valuable research to the economics community.|
-| | | 
+
 
 
 ## Repository Structure
