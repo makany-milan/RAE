@@ -11,6 +11,7 @@ clear programs
 set varabbrev off
 
 
+
 * Procedure Outline
 * 1) Collect data from OpenAlex
 *		This step was performed in python. The stata integration of python is a 
@@ -22,8 +23,28 @@ set varabbrev off
 *		Merge to OpenAlex data based on ISSN number where available, otherwise
 *		based on the name of the journal.
 
-do data_processing/merge_journal_data
-
 
 * 3) Construct a panel data of publications and affiliations on authors that
 *	 publish in the field of economics.
+
+
+* Define global variables
+global scripts_folder = "C:\Users\u2048873\RAE"
+global data_folder = "C:\Users\u2048873\rae_data"
+
+* 1) Collect data from OpenAlex
+
+
+* 2) Filter authors based on publications in economics journals
+* Import and merge journal data from OpenAlex, WOS, and Econlit
+cd "$scripts_folder"
+do "data_processing/merge_journal_data.do"
+* General observations: econlit stores a greater amount of journals
+* There are journals on web of science (n=120) that econlit does not store
+* There are primiarily foreign language publications
+
+* Check the accuracy of OpenAlex XCONCEPT classifications
+* If these are accurate, potentially use this classification to include more
+* journals in the database
+cd "$scripts_folder"
+do "data_processing/openalex_journal_xconcept_accuracy.do"
