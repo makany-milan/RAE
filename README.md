@@ -21,7 +21,7 @@ The codes in the repository are used by the author to extract, process, and anal
 
 
 0) Research Proposal / Outline - ***/proposal/***
-    - Formulate a research question, identify key data source, and discuss identification
+    - Propose a research question, identify key data source, and discuss identification
 
 **Make sure to change all file and folder paths when running the code**
 
