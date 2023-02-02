@@ -14,6 +14,7 @@ drop year _merge
 rename pub_year year
 merge m:1 author_id year using "affiliations/affiliations_fix_year.dta"
 drop if _merge == 2
+drop _merge
 
 * check if there are any issues with inferring the institution
 gen issue = 1 if aff_inst_id != aff_inst_id_inferred & aff_inst_id != . & aff_inst_id_inferred  != .
@@ -33,3 +34,13 @@ drop moves mover
 egen moves = nvals(aff_inst_id), by(author_id)
 replace moves = moves - 1
 gen mover = moves != 0 // 89.77% of the sample are movers
+
+
+* merge publications to journals
+merge m:1 journal_id using "journals/econ_journals.dta"
+drop if _merge == 2
+
+* find proportion of publications in economics journals
+replace econ_journal = 0 if econ_journal == . // overall 17.19%
+
+save "works", replace
