@@ -43,8 +43,12 @@ class File:
                 raw_data = self.compressed_contents.readline()
                 self.read_lock.release()
             except (EOFError, StopIteration):
+                self.read_lock.release()
                 end_of_file = True
                 break
+            except:
+                pass
+                self.read_lock.release()
             if not raw_data:
                 break
             try:
@@ -57,6 +61,8 @@ class File:
             # in this case the data should not be appended to the storage
             if data:
                 self.local_storage.append_data(data)
+            
+        self.read_lock.release()
 
     
     def add_local_storage(self, storage):
@@ -99,6 +105,74 @@ class Institution(File):
         return inst_data
 
 
+class Affiliation(File):
+    def __init__(self, file_path):
+        super().__init__(file_path)
+
+
+    def extract_data(self):
+        end_of_file = False
+        while not end_of_file:
+            try:
+                self.read_lock.acquire()
+                raw_data = self.compressed_contents.readline()
+                self.read_lock.release()
+            except EOFError:
+                self.read_lock.release()
+                break
+            except:
+                self.read_lock.release()
+                pass
+            if not raw_data:
+                break
+                   
+            decoded = raw_data.decode('utf-8')
+            json_data = json.loads(decoded)
+            data = self.extract_json_data(json_data)
+            # if the work is corrupted or has been deleted the function will return None
+            # in this case the data should not be appended to the storage
+            if data:
+                self.local_storage.extend_data(data)
+        self.read_lock.release()
+    
+
+    def extract_json_data(self, json_data):
+        # store data on the paper in list
+        affiliation_data = []
+        
+        paper_id = json_data['id']
+        paper_id = int(re.search('[0-9]+', paper_id).group(0))
+        pub_year = json_data['publication_year']
+
+        # extract data on authorship
+        number_of_authors = len(json_data['authorships'])
+
+        if number_of_authors == 0:
+            return None
+        else:
+            authors = [x for x in json_data['authorships']]
+            for author in authors:
+                try:
+                    author_id = author['author']['id']
+                    author_id = int(re.search('[0-9]+', author_id).group(0))
+                except:
+                    return None
+
+                aff_str = author['raw_affiliation_string']
+                aff_inst_id = None
+                affiiation_json = author['institutions']
+                if affiiation_json:
+                    if affiiation_json[0]:
+                        try:
+                            aff_inst_id = int(re.search('[0-9]+', affiiation_json[0]['id']).group(0))
+                        except:
+                            aff_str = None
+                if not (aff_inst_id==None and aff_str == None):
+                    affiliation_data.append([author_id, paper_id, aff_inst_id, aff_str, pub_year])
+            
+        return affiliation_data
+   
+
 class Work(File):
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -112,7 +186,11 @@ class Work(File):
                 raw_data = self.compressed_contents.readline()
                 self.read_lock.release()
             except EOFError:
+                self.read_lock.release()
                 break
+            except:
+                self.read_lock.release()
+                pass
             if not raw_data:
                 break
                    
@@ -123,6 +201,7 @@ class Work(File):
             # in this case the data should not be appended to the storage
             if data:
                 self.local_storage.extend_data(data)
+        self.read_lock.release()
     
 
     def extract_json_data(self, json_data):
@@ -320,7 +399,7 @@ class Concept(File):
 
 
 class Storage:
-    def __init__(self, export_location, extract_config, batch_size = 250000 ,local=True):
+    def __init__(self, export_location, extract_config, batch_size = 250_000 ,local=True):
         self.data = []
         self.batch_size = 0
         self.batch_length = batch_size
