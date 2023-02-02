@@ -179,5 +179,8 @@ save "formatted/all_journals.dta", replace
 
 * Save merged Economics journals
 keep if econ_journal == 1 // 1287 journals matched
+
+format journal_id %12.0g
+
 cd "$data_folder"
 save "econ_journals.dta", replace

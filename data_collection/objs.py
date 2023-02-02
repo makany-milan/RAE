@@ -333,19 +333,19 @@ class Storage:
     def append_data(self, incoming_data):
         self.lock.acquire()
         self.data.append(incoming_data)
-        self.lock.release()
         self.batch_size += 1
         if self.batch_size > self.batch_length:
             self.export_batch()
+        self.lock.release()
 
     
     def extend_data(self, incoming_data):
         self.lock.acquire()
         self.data.extend(incoming_data)
-        self.lock.release()
-        self.batch_size += 1
+        self.batch_size += len(incoming_data)
         if self.batch_size > self.batch_length:
             self.export_batch()
+        self.lock.release()
 
 
     def init_export_file(self):
@@ -356,13 +356,10 @@ class Storage:
 
 
     def export_batch(self):
-        self.lock.acquire()
         # write to csv or upload to database. maybe both?
         self.export_batch_to_csv()
-
         # clear the current batch of data from memory
         self.data = []
-        self.lock.release()
         self.batch_size = 0
         
 

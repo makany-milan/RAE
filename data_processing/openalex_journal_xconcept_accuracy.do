@@ -21,7 +21,7 @@ replace econ = 1 if strpos(lower(description), "economic")
 
 * This list can be extended under certain assumptions
 * price, market, bargaining, money, finance, industry, etc.
-/ *
+/*
 replace econ = 1 if strpos(lower(concept_name), "business")
 replace econ = 1 if strpos(lower(description), "business")
 replace econ = 1 if strpos(lower(concept_name), "finance")

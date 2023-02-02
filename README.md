@@ -12,9 +12,10 @@ The codes in the repository are used by the author to extract, process, and anal
 | Source | Official Description |
 | ------ | ----------- | 
 | [OpenAlex](https://openalex.org/) | OpenAlex is a free and open catalog of the world's scholarly papers, researchers, journals, and institutions — along with all the ways they're connected to one another.|
-| [Web of Science](https://mjl.clarivate.com/collection-list-downloads) | The Master Journal List is an invaluable tool to help you to find the right journal for your needs across multiple indices hosted on the Web of Science platform.|
+| [Web of Science Master Journal List](https://mjl.clarivate.com/collection-list-downloads) | The Master Journal List is an invaluable tool to help you to find the right journal for your needs across multiple indices hosted on the Web of Science platform.|
+| [Web of Science Journal Citation Reports](https://jcr.clarivate.com/jcr/browse-journals) | The Journal Citation Reports provides data on Journal Article Influence Scores and Journal Impact factor. This data can be useful to construct a measure of publication quality.|
 | [EconLit](https://www.aeaweb.org/econlit/journal_list.php) | EconLit provides the coverage most needed by scholars to make new discoveries, develop important insights, and contribute valuable research to the economics community.|
-
+| [Processed Data](https://drive.google.com/drive/folders/1V2oDuHfGY-sSDt4ECUGdFOV_83uO-ACO?usp=share_link) | Google Drive link to all the raw data files used for the analysis. Extracted and pre-processed from OpenAlex, journal data from WoS and EconLit. The data extraction is replicable and modifiable by altering the codes in */data_collection/* |
 
 
 ## Repository Structure

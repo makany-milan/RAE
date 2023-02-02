@@ -26,7 +26,7 @@ set varabbrev off
 
 * Define global variables
 global scripts_folder = "C:\Users\u2048873\RAE"
-global data_folder = "C:\Users\u2048873\rae_data"
+global data_folder = "D:\rae_data"
 
 * 1) Collect data from OpenAlex
 *		This step was performed in python. The stata integration of python is a 
@@ -34,8 +34,10 @@ global data_folder = "C:\Users\u2048873\rae_data"
 
 * 2) Filter authors based on publications in economics journals
 * Import and merge journal data from OpenAlex, WOS, and Econlit
+
 cd "$scripts_folder"
-do "data_processing/merge_journal_data.do"
+do "data_processing/merge_journal_data.do" // 1,385 journals matched to OpenAlex
+
 * General observations: econlit stores a greater amount of journals
 * There are journals on web of science (n=120) that econlit does not store
 * There are primiarily foreign language publications
@@ -43,5 +45,8 @@ do "data_processing/merge_journal_data.do"
 * Check the accuracy of OpenAlex XCONCEPT classifications
 * If these are accurate, potentially use this classification to include more
 * journals in the database
-cd "$scripts_folder"
-do "data_processing/openalex_journal_xconcept_accuracy.do"
+*cd "$scripts_folder"
+*do "data_processing/openalex_journal_xconcept_accuracy.do"
+* These X-CONCEPTS can be later used to expand the sample.
+
+* Using the matched IDs in OpenAlex
