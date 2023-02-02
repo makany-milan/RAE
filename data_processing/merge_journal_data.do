@@ -183,4 +183,8 @@ keep if econ_journal == 1 // 1287 journals matched
 format journal_id %12.0g
 
 cd "$data_folder"
-save "econ_journals.dta", replace
+save "journals/econ_journals.dta", replace
+
+* export a list of journal ids to filter in openalex
+export delimited using "journals/journals.csv"
+

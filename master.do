@@ -11,6 +11,11 @@ clear programs
 set varabbrev off
 
 
+/*
+* Install packages
+capture ssc install egenmore
+*/
+
 
 * Procedure Outline
 * 1) Collect data from OpenAlex
@@ -49,4 +54,15 @@ do "data_processing/merge_journal_data.do" // 1,385 journals matched to OpenAlex
 *do "data_processing/openalex_journal_xconcept_accuracy.do"
 * These X-CONCEPTS can be later used to expand the sample.
 
-* Using the matched IDs in OpenAlex
+* Identify publications based on matched journal IDs
+* see filter.py - filter_econ_authors_journals()
+
+* Extract publications for authors that have published in economics journals
+* see filter.py - filter_econ_pubs()
+
+* Extract affiliations for authors that have published in economics journals
+* see filter.py - filter_econ_affiliations()
+
+* 3) Construct a panel of publications and affiliations
+cd "$scripts_folder"
+do "data_preparation/import_works_and_affiliations.do"
