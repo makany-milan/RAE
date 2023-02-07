@@ -5,10 +5,18 @@ clear
 cd "$data_folder"
 import delimited using "openalex_data/openalex-econ_affiliations.csv", delimiter(";") encoding(utf-8) bindquotes(strict) maxquotedrows(unlimited)
 
+* drop some corrupt observations
+drop if year > 2023
+* restrict the sample between 1950 and 2023
+drop if year < 1950
+
 * check the proportion of movers
 egen moves = nvals(aff_inst_id), by(author_id)
-replace moves = moves - 1
+replace moves = moves - 1 if moves != 0
 gen mover = moves != 0 // 77.37% of the sample are movers
+
+assert mover != .
+assert moves != .
 
 * remove string variable - potentially check later for consistency
 drop aff_inst_str
@@ -18,7 +26,7 @@ bys paper_id author_id: gen dupe = _n
 keep if dupe == 1
 drop dupe
 
-mkdir "affiliations"
+capture mkdir "affiliations"
 save "affiliations/affiliations.dta", replace
 
 * save file for those observations where we do not see within year movement

@@ -186,5 +186,5 @@ cd "$data_folder"
 save "journals/econ_journals.dta", replace
 
 * export a list of journal ids to filter in openalex
-export delimited using "journals/journals.csv"
+* export delimited using "journals/journals.csv"
 

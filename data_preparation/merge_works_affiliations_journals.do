@@ -9,15 +9,18 @@ merge 1:1 paper_id author_id using "affiliations/affiliations.dta" // 18.21% has
 drop if _merge == 2
 drop year _merge
 
+
 * merge to affiliations based on year and author
 * here this only merges authors who have no within year institution conflict
 rename pub_year year
-merge m:1 author_id year using "affiliations/affiliations_fix_year.dta"
+merge m:1 author_id year using "affiliations/affiliations_fix_year.dta", update
 drop if _merge == 2
 drop _merge
 
+
 * check if there are any issues with inferring the institution
 gen issue = 1 if aff_inst_id != aff_inst_id_inferred & aff_inst_id != . & aff_inst_id_inferred  != .
+assert issue != 1
 // there are no issues
 drop issue
 
@@ -27,20 +30,31 @@ drop aff_inst_id_inferred
 
 * infer the value of institution based on years before and after
 
+* replace moves and mover variables for missing obs
+* infer from values of other publications
+gsort author_id -mover
 
-* regenerate moves and mover variables
-drop moves mover
-* proportion of movers
-egen moves = nvals(aff_inst_id), by(author_id)
-replace moves = moves - 1
-gen mover = moves != 0 // 89.77% of the sample are movers
+by author_id: replace mover = mover[1] if missing(mover)
+by author_id: replace moves = moves[1] if missing(moves)
+
+* drop authors without affiliations
+drop if mover == . //  8.65%
 
 
 * merge publications to journals
 merge m:1 journal_id using "journals/econ_journals.dta"
 drop if _merge == 2
 
+
 * find proportion of publications in economics journals
 replace econ_journal = 0 if econ_journal == . // overall 17.19%
+drop _merge
+
+
+* merge all journals
+merge m:1 journal_id using "journals/formatted/all_journals.dta", update
+drop if _merge == 2
+drop _merge
+
 
 save "works", replace

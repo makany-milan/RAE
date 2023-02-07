@@ -17,6 +17,12 @@ capture ssc install egenmore
 */
 
 
+* GLOBAL SETTINGS
+* Classifications as economist: what proportion of publications is required to be
+* in economics to be treated as an economist
+global ec_prop_cutoff = 0.5
+
+
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -27,6 +33,12 @@ capture ssc install egenmore
 
 * 3) Construct a panel data of publications and affiliations on authors that
 *	 publish in the field of economics.
+* 	3a) Infer affiliation for missing observations
+
+
+* 4) Import impact factor and other meaasures of journal quality
+
+* 5) Analysis
 
 
 * Define global variables
@@ -42,6 +54,8 @@ global data_folder = "D:\rae_data"
 
 cd "$scripts_folder"
 do "data_processing/merge_journal_data.do" // 1,385 journals matched to OpenAlex
+
+* SOME NON-ECONOMICS JOURNALS ARE MISSING
 
 * General observations: econlit stores a greater amount of journals
 * There are journals on web of science (n=120) that econlit does not store
@@ -66,3 +80,35 @@ do "data_processing/merge_journal_data.do" // 1,385 journals matched to OpenAlex
 * 3) Construct a panel of publications and affiliations
 cd "$scripts_folder"
 do "data_preparation/import_works_and_affiliations.do"
+* merge to journals and affiliations
+cd "$scripts_folder"
+do "data_preparation/merge_works_affiliations_journals.do"
+
+* drop useless variables
+drop see formerly publisheraddress webofsciencecategories 
+
+* 3a) Filter for economics authors
+cd "$scripts_folder"
+do "data_preparation/filter_econ_authors.do"
+
+* format variables
+format paper_id %12.0g
+format journal_id %12.0g
+format aff_inst_id %12.0g
+
+* 3b) Infer affiliation for missing observations
+cd "$scripts_folder"
+do "data_preparation/infer_affiliation.do" 
+* WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
+* OF A CONSISTENT INSTITUTION
+
+cd "$data_folder"
+save "works", replace
+
+* 4) Import impact factor and other meaasures of journal quality
+cd "$scripts_folder"
+do "data_preparation/import_merge_jcr.do" 
+
+
+* 5) Analysis
+
