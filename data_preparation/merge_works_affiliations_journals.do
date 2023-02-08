@@ -5,7 +5,7 @@ cd "$data_folder"
 use "works.dta"
 
 * merge to affiliations based on publication and author
-merge 1:1 paper_id author_id using "affiliations/affiliations.dta" // 18.21% has affiliation
+merge 1:1 paper_id author_id using "affiliations/affiliations.dta", update // 18.21% has affiliation
 drop if _merge == 2
 drop year _merge
 
@@ -25,7 +25,7 @@ assert issue != 1
 drop issue
 
 * replace value of aff_inst_id to the inferred values
-replace aff_inst_id = aff_inst_id_inferred if aff_inst_id_inferred != .
+replace aff_inst_id = aff_inst_id_inferred if aff_inst_id == .
 drop aff_inst_id_inferred
 
 * infer the value of institution based on years before and after
@@ -40,11 +40,16 @@ by author_id: replace moves = moves[1] if missing(moves)
 * drop authors without affiliations
 drop if mover == . //  8.65%
 
+* confirm that there are no authors left without affiliation
+
+bys author_id: egen n_inst = nvals(aff_inst_id), missing
+assert n_inst != .
+drop n_inst
+
 
 * merge publications to journals
-merge m:1 journal_id using "journals/econ_journals.dta"
+merge m:1 journal_id using "journals/econ_journals.dta", update
 drop if _merge == 2
-
 
 * find proportion of publications in economics journals
 replace econ_journal = 0 if econ_journal == . // overall 17.19%

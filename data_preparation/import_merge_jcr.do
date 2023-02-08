@@ -25,12 +25,14 @@ save "jcr/formatted/jcr-ec", replace
 
 * merge based on issn
 keep if issn != "N/A"
+replace eissn = issn
 save "jcr/formatted/jcr-ec-issn", replace
 
 * merge based on e-issn
 clear
 use "jcr/formatted/jcr-ec", replace
 keep if eissn != "N/A"
+replace issn = eissn
 save "jcr/formatted/jcr-ec-eissn", replace
 
 
@@ -41,7 +43,15 @@ merge m:1 issn using "jcr/formatted/jcr-ec-issn"
 drop if _merge == 2
 drop _merge
 
+merge m:1 eissn using "jcr/formatted/jcr-ec-issn"
+drop if _merge == 2
+drop _merge
+
 merge m:1 eissn using "jcr/formatted/jcr-ec-eissn", update
+drop if _merge == 2
+drop _merge
+
+merge m:1 issn using "jcr/formatted/jcr-ec-eissn", update
 drop if _merge == 2
 drop _merge
 
@@ -53,12 +63,14 @@ save "works", replace
 clear
 use "jcr/formatted/jcr-ec", replace
 keep if eissn != "N/A"
+replace issn = eissn
 save "jcr/formatted/jcr-ec-issn", replace
 
 * merge based on e-issn
 clear
 use "jcr/formatted/jcr-ec", replace
 keep if issn != "N/A"
+replace eissn = issn
 save "jcr/formatted/jcr-ec-eissn", replace
 
 clear
@@ -68,6 +80,14 @@ merge m:1 eissn using "jcr/formatted/jcr-ec-issn", update
 drop if _merge == 2
 drop _merge
 
+merge m:1 issn using "jcr/formatted/jcr-ec-issn", update
+drop if _merge == 2
+drop _merge
+
 merge m:1 issn using "jcr/formatted/jcr-ec-eissn", update
+drop if _merge == 2
+drop _merge
+
+merge m:1 eissn using "jcr/formatted/jcr-ec-eissn", update
 drop if _merge == 2
 drop _merge

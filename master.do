@@ -37,8 +37,13 @@ global ec_prop_cutoff = 0.5
 
 
 * 4) Import impact factor and other meaasures of journal quality
+* 	4a) Assign gender
+*	4b) Merge journal rankings
+*	4c) Generate pub quality author-year panel
+
 
 * 5) Analysis
+* 	5a) Generate summary statistics and descriptive graphs
 
 
 * Define global variables
@@ -93,10 +98,23 @@ do "data_preparation/filter_econ_authors.do"
 
 
 * 3b) Infer affiliation for missing observations
+cd "$data_folder"
+clear
+use "works"
+
 cd "$scripts_folder"
-do "data_preparation/infer_affiliation.do" 
+do "data_preparation/infer_affiliation.do"
+
+
+cd "$data_folder"
+save "works", replace
+
 * WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
 * OF A CONSISTENT INSTITUTION
+
+
+* remove observations where journal is missing
+drop if missing(journal_name)
 
 * 4) Import impact factor and other meaasures of journal quality
 cd "$scripts_folder"
@@ -108,14 +126,25 @@ format paper_id %12.0g
 format journal_id %12.0g
 format aff_inst_id %12.0g
 
-* 4a) Assign gender
+
+* 4a) Separate surname forename
+cd "$scripts_folder"
+do "data_preparation/separate_surname_forename.do"
+
+
+* 4b) Assign gender
 cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
 
 
+* 4c) Generate pub quality author-year panel
+cd "$scripts_folder"
+do "data_preparation/generate_panel.do" 
+
 * 5) Analysis
+* Install TWFE
+capture ssc install TWFE
+
 * 5a) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
-
-

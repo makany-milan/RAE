@@ -1,12 +1,8 @@
 * 3b) Infer affiliation for missing observations
 
-cd "$data_folder"
-clear
-use "works"
-
 * replace affiliation for those where we only observe 1 institution
 gsort author_id -aff_inst_id
-by author_id: replace aff_inst_id = aff_inst_id[1] if missing(aff_inst_id) & mover == 0 //  28.29% missing
+capture by author_id: replace aff_inst_id = aff_inst_id[1] if missing(aff_inst_id) & mover == 0 //  28.29% missing
 
 * fill institutions where the empty observations are not between moves
 
@@ -75,11 +71,6 @@ assert !missing(aff_inst_id)
 
 
 drop above_or_below above_id below_id author_paper_n aff_inst_id_inf
-
-
-cd "$data_folder"
-save "works", replace
-
 
 
 * WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
