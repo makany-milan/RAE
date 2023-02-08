@@ -13,4 +13,5 @@ bys author_id: egen ec_prop = mean(econ_journal)
 * keep observations of authors who publish in economics
 keep if ec_prop > $ec_prop_cutoff
 
+cd "$data_folder"
 save "works", replace

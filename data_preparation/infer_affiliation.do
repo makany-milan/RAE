@@ -18,6 +18,8 @@ gen above_id = -1 if aff_inst_id != .
 gen below_id = -1 if aff_inst_id != .
 
 
+bys author_id: gen num_pubs = _N
+
 * loop through all potential values
 qui: su num_pubs
 local max_dist = ceil((`r(max)'- 1) / 2)
@@ -66,15 +68,19 @@ gen above_or_below = uniform() if missing(aff_inst_id_inf) & aff_inst_id[above_i
 by author_id: replace aff_inst_id_inf = aff_inst_id[below_id] if above_or_below < .5 & missing(aff_inst_id_inf)
 by author_id: replace aff_inst_id_inf = aff_inst_id[above_id] if above_or_below > .5 & missing(aff_inst_id_inf)
 
-drop above_or_below above_id below_id author_paper_n aff_inst_id_inf
-
 
 replace aff_inst_id = aff_inst_id_inf if missing(aff_inst_id)
 * confirm that there are no missing institutions
 assert !missing(aff_inst_id)
 
+
+drop above_or_below above_id below_id author_paper_n aff_inst_id_inf
+
+
 cd "$data_folder"
 save "works", replace
+
+
 
 * WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
 * OF A CONSISTENT INSTITUTION

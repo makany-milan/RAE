@@ -91,10 +91,6 @@ drop see formerly publisheraddress webofsciencecategories
 cd "$scripts_folder"
 do "data_preparation/filter_econ_authors.do"
 
-* format variables
-format paper_id %12.0g
-format journal_id %12.0g
-format aff_inst_id %12.0g
 
 * 3b) Infer affiliation for missing observations
 cd "$scripts_folder"
@@ -102,13 +98,24 @@ do "data_preparation/infer_affiliation.do"
 * WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
 * OF A CONSISTENT INSTITUTION
 
-cd "$data_folder"
-save "works", replace
-
 * 4) Import impact factor and other meaasures of journal quality
 cd "$scripts_folder"
 do "data_preparation/import_merge_jcr.do" 
 
+* format variables
+format author_id %12.0g
+format paper_id %12.0g
+format journal_id %12.0g
+format aff_inst_id %12.0g
+
+* 4a) Assign gender
+cd "$scripts_folder"
+do "data_preparation/assign_gender.do"
+
 
 * 5) Analysis
+* 5a) Generate summary statistics and descriptive graphs
+cd "$scripts_folder"
+do "data_analysis/summary_stats.do" 
+
 
