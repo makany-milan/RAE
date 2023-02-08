@@ -19,9 +19,8 @@ replace top5 = 1 if journal_name == "The Review of Economic Studies"
 gsort author_id +year
 by author_id: gen reltime = (year - year[1]) +1 
 
+* some reltime values are unrealistic - data issues is reltime above 75 ?
 
-cd "$data_folder"
-merge m:1 author_id using 
 
 save "works", replace
 
