@@ -50,6 +50,13 @@ global ec_prop_cutoff = 0.5
 global scripts_folder = "C:\Users\u2048873\RAE"
 global data_folder = "D:\rae_data"
 
+*
+* home PC
+global scripts_folder = "E:\OneDrive\Desktop\RAE"
+global data_folder = "D:\GoogleDrive\RAE"
+
+*/
+
 * 1) Collect data from OpenAlex
 *		This step was performed in python. The stata integration of python is a 
 *		bit unreliable and OS dependent.
