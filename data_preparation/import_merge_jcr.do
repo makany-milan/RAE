@@ -11,11 +11,13 @@ drop in `r(N-)'-1
 drop in `r(N-)'-1
 
 rename journalname journal_name
-keep issn eissn totalcitations jif jci jcipercentile eigenfactor normalizedeigenfactor jifpercentile articleinfluencescore yearjif jifwithoutselfcites
+rename articleinfluencescore aif
+keep issn eissn totalcitations aif jif jci jcipercentile eigenfactor normalizedeigenfactor jifpercentile yearjif jifwithoutselfcites
 destring totalcitations, replace dpcomma
 destring jif, replace i("N/A")
+destring aif, replace i("N/A")
 destring jifpercentile, replace i("N/A")
-destring articleinfluencescore, replace i("N/A")
+destring aif, replace i("N/A")
 destring yearjif, replace i("N/A")
 destring jifwithoutselfcites, replace i("N/A")
 

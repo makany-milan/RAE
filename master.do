@@ -26,14 +26,16 @@ global ec_prop_cutoff = 0.5
 global scripts_folder = "C:\Users\u2048873\RAE"
 global data_folder = "D:\rae_data"
 
-*
+/*
 * home PC
 global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
+*/
 
-/*
+*
 * Procedure Outline
 * 1) Collect data from OpenAlex
+
 
 * 2) Filter authors based on publications in economics journals
 *		Use a list of economics journals from Web of Science (WOS) and EconLit
@@ -46,10 +48,9 @@ global data_folder = "D:\GoogleDrive\RAE"
 
 
 * 4) Import impact factor and other meaasures of journal quality
-* 	4a) Assign gender
-*	4b) Merge journal rankings
-*	4c) Generate pub quality author-year panel
-
+*	4a) Merge journal rankings
+*	4b) Generate pub quality author-year panel
+* 	4c) Assign gender
 
 * 5) Analysis
 * 	5a) Generate summary statistics and descriptive graphs
@@ -143,15 +144,14 @@ cd "$scripts_folder"
 do "data_preparation/separate_surname_forename.do"
 
 
-* 4b) Assign gender
-cd "$scripts_folder"
-do "data_preparation/assign_gender.do"
-
-
-* 4c) Generate pub quality author-year panel
+* 4b) Generate pub quality author-year panel
 cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
 
+
+* 4c) Assign gender
+cd "$scripts_folder"
+do "data_preparation/assign_gender.do"
 
 
 * 5) Analysis

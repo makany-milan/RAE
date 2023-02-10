@@ -23,13 +23,17 @@ by author_id: gen reltime = (year - first_pub) + 1
 * some reltime values are unrealistic - data issues is reltime above 75 ?
 drop if reltime > 75
 
+gen waif = aif / number_of_authors
 gen wjif = jif / number_of_authors
 gen wjci = jci / number_of_authors
 gen wjifwsc = jifwithoutselfcites / number_of_authors
 gen wcitations = citations / number_of_authors
 gen wtop5 = top5 / number_of_authors
 
-collapse (first)aff_inst_id=aff_inst_id reltime=reltime (sum) jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 (count)num_pubs=author_id, by(author_id year)
+gen wpubs = 1/number_of_authors
+gen author2= author_id
+
+collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2, by(author_id year)
 xtset author_id year
 tsfill
 
