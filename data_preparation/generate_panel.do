@@ -29,7 +29,7 @@ gen wjifwsc = jifwithoutselfcites / number_of_authors
 gen wcitations = citations / number_of_authors
 gen wtop5 = top5 / number_of_authors
 
-collapse (first)aff_inst_id=aff_inst_id reltime=reltime (sum) jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5, by(author_id year)
+collapse (first)aff_inst_id=aff_inst_id reltime=reltime (sum) jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 (count)num_pubs=author_id, by(author_id year)
 xtset author_id year
 tsfill
 
@@ -45,6 +45,7 @@ by author_id: replace reltime = _n
 * Infer affiliation for missing observations
 cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do" 
+
 
 cd "$data_folder"
 save "panel", replace
