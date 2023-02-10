@@ -22,7 +22,7 @@ capture ssc install egenmore
 * in economics to be treated as an economist
 global ec_prop_cutoff = 0.5
 
-
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -55,7 +55,7 @@ global data_folder = "D:\rae_data"
 global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
 
-*/
+
 
 * 1) Collect data from OpenAlex
 *		This step was performed in python. The stata integration of python is a 
@@ -127,6 +127,10 @@ drop if missing(journal_name)
 cd "$scripts_folder"
 do "data_preparation/import_merge_jcr.do" 
 
+*/
+
+
+
 * format variables
 format author_id %12.0g
 format paper_id %12.0g
@@ -147,6 +151,8 @@ do "data_preparation/assign_gender.do"
 * 4c) Generate pub quality author-year panel
 cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
+
+
 
 * 5) Analysis
 * Install TWFE
