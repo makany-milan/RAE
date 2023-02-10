@@ -38,3 +38,6 @@ rename fe2 jif_inst_fe
 
 * keep one observations per author
 *bys author_id (year): gen unique_fe = _n
+
+* time series
+collapse (mean) jif_ma3=jif_ma3 wjif_ma3=wjif_ma3 jci_ma3=jci_ma3 wjci_ma3=wjci_ma3 jifwsc_ma3=jifwsc_ma3 wjifwsc_ma3=wjifwsc_ma3 citations_ma3=citations_ma3 wcitations_ma3=wcitations_ma3 top5s_ma3=top5s_ma3 wtop5s_ma3=wtop5s_ma3 (p5) jif_ma3_p5=jif_ma3 wjif_ma3_p5=wjif_ma3 jci_ma3_p5=jci_ma3 wjci_ma3_p5=wjci_ma3 jifwsc_ma3_p5=jifwsc_ma3 wjifwsc_ma3_p5=wjifwsc_ma3 citations_ma3_p5=citations_ma3 wcitations_ma3_p5=wcitations_ma3 top5s_ma3_p5=top5s_ma3 wtop5s_ma3_p5=wtop5s_ma3 (p95) jif_ma3_p95=jif_ma3 wjif_ma3_p95=wjif_ma3 jci_ma3_p95=jci_ma3 wjci_ma3_p95=wjci_ma3 jifwsc_ma3_p95=jifwsc_ma3 wjifwsc_ma3_p95=wjifwsc_ma3 citations_ma3_p95=citations_ma3 wcitations_ma3_p95=wcitations_ma3 top5s_ma3_p95=top5s_ma3 wtop5s_ma3_p95=wtop5s_ma3, by(reltime)
