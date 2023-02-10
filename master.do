@@ -32,7 +32,7 @@ global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
 */
 
-*
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -51,6 +51,7 @@ global data_folder = "D:\GoogleDrive\RAE"
 *	4a) Merge journal rankings
 *	4b) Generate pub quality author-year panel
 * 	4c) Assign gender
+* 	4d) Merge university rankings
 
 * 5) Analysis
 * 	5a) Generate summary statistics and descriptive graphs
@@ -124,24 +125,11 @@ save "works", replace
 * remove observations where journal is missing
 drop if missing(journal_name)
 
-* 4) Import impact factor and other meaasures of journal quality
+* 4a) Import impact factor and other meaasures of journal quality
 cd "$scripts_folder"
 do "data_preparation/import_merge_jcr.do" 
 
 */
-
-
-
-* format variables
-format author_id %12.0g
-format paper_id %12.0g
-format journal_id %12.0g
-format aff_inst_id %12.0g
-
-
-* 4a) Separate surname forename
-cd "$scripts_folder"
-do "data_preparation/separate_surname_forename.do"
 
 
 * 4b) Generate pub quality author-year panel
@@ -154,6 +142,8 @@ cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
 
 
+* 4d) Merge university rankings
+
 * 5) Analysis
 * Install TWFE
 capture ssc install TWFE
@@ -161,3 +151,11 @@ capture ssc install TWFE
 * 5a) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
+
+/*
+* format variables
+format author_id %12.0g
+format paper_id %12.0g
+format journal_id %12.0g
+format aff_inst_id %12.0g
+*/

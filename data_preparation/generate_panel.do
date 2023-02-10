@@ -33,11 +33,11 @@ gen wtop5 = top5 / number_of_authors
 gen wpubs = 1/number_of_authors
 gen author2= author_id
 
-collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2, by(author_id year)
+collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
 xtset author_id year
 tsfill
 
-foreach lvar of varlist jif wjif jci wjci jifwsc wjifwsc citations wcitations top5s wtop5s {
+foreach lvar of varlist aif jif wjif jci wjci jifwsc wjifwsc citations wcitations top5s wtop5s {
 	replace `lvar' = 0 if missing(`lvar')
 	gen `lvar'_ma3 = (l1.`lvar' + `lvar' + f1.`lvar') / 3
 }
