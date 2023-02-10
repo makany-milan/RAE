@@ -27,12 +27,17 @@ drop tag unique
 
 * active years
 su active_years if reltime==1, det
-*hist active_years if reltime == 1, bin(75)
+hist active_years if reltime == 1, bin(75)
+
+bys aff_inst_id: egen inst_authors = nvals(author_id)
+replace aff_inst_id = . if inst_authors == 1
+
+keep if year > 1970
 
 * AKM
 xtset author_id reltime
 
-*twfe jif_ma3, ids(author_id aff_inst_id) maxit(2000)
+xi: twfe jif_ma3 i.year, ids(author_id aff_inst_id) maxit(2000)
 rename fe1 jif_author_fe
 rename fe2 jif_inst_fe
 
@@ -43,6 +48,7 @@ gen female = 0 if p_female < 0
 replace female = 1 if p_female > 0
 
 * time series
-collapse (count) n_authors=author_id (mean) jif_ma3=jif_ma3 wjif_ma3=wjif_ma3 jci_ma3=jci_ma3 wjci_ma3=wjci_ma3 jifwsc_ma3=jifwsc_ma3 wjifwsc_ma3=wjifwsc_ma3 citations_ma3=citations_ma3 wcitations_ma3=wcitations_ma3 top5s_ma3=top5s_ma3 wtop5s_ma3=wtop5s_ma3 (p5) jif_ma3_p5=jif_ma3 wjif_ma3_p5=wjif_ma3 jci_ma3_p5=jci_ma3 wjci_ma3_p5=wjci_ma3 jifwsc_ma3_p5=jifwsc_ma3 wjifwsc_ma3_p5=wjifwsc_ma3 citations_ma3_p5=citations_ma3 wcitations_ma3_p5=wcitations_ma3 top5s_ma3_p5=top5s_ma3 wtop5s_ma3_p5=wtop5s_ma3 (p95) jif_ma3_p95=jif_ma3 wjif_ma3_p95=wjif_ma3 jci_ma3_p95=jci_ma3 wjci_ma3_p95=wjci_ma3 jifwsc_ma3_p95=jifwsc_ma3 wjifwsc_ma3_p95=wjifwsc_ma3 citations_ma3_p95=citations_ma3 wcitations_ma3_p95=wcitations_ma3 top5s_ma3_p95=top5s_ma3 wtop5s_ma3_p95=wtop5s_ma3, by(reltime female)
+* pubs=num_pubs
+collapse (mean)  wpubs=wpubs jif_ma3=jif_ma3 wjif_ma3=wjif_ma3 jci_ma3=jci_ma3 wjci_ma3=wjci_ma3 jifwsc_ma3=jifwsc_ma3 wjifwsc_ma3=wjifwsc_ma3 citations_ma3=citations_ma3 wcitations_ma3=wcitations_ma3 top5s_ma3=top5s_ma3 wtop5s_ma3=wtop5s_ma3 (p5) jif_ma3_p5=jif_ma3 wjif_ma3_p5=wjif_ma3 jci_ma3_p5=jci_ma3 wjci_ma3_p5=wjci_ma3 jifwsc_ma3_p5=jifwsc_ma3 wjifwsc_ma3_p5=wjifwsc_ma3 citations_ma3_p5=citations_ma3 wcitations_ma3_p5=wcitations_ma3 top5s_ma3_p5=top5s_ma3 wtop5s_ma3_p5=wtop5s_ma3 (p95) jif_ma3_p95=jif_ma3 wjif_ma3_p95=wjif_ma3 jci_ma3_p95=jci_ma3 wjci_ma3_p95=wjci_ma3 jifwsc_ma3_p95=jifwsc_ma3 wjifwsc_ma3_p95=wjifwsc_ma3 citations_ma3_p95=citations_ma3 wcitations_ma3_p95=wcitations_ma3 top5s_ma3_p95=top5s_ma3 wtop5s_ma3_p95=wtop5s_ma3, by(reltime)
 
 
