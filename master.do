@@ -22,6 +22,15 @@ capture ssc install egenmore
 * in economics to be treated as an economist
 global ec_prop_cutoff = 0.5
 
+
+global scripts_folder = "C:\Users\u2048873\RAE"
+global data_folder = "D:\rae_data"
+
+*
+* home PC
+global scripts_folder = "E:\OneDrive\Desktop\RAE"
+global data_folder = "D:\GoogleDrive\RAE"
+
 /*
 * Procedure Outline
 * 1) Collect data from OpenAlex
@@ -45,15 +54,6 @@ global ec_prop_cutoff = 0.5
 * 5) Analysis
 * 	5a) Generate summary statistics and descriptive graphs
 
-
-* Define global variables
-global scripts_folder = "C:\Users\u2048873\RAE"
-global data_folder = "D:\rae_data"
-
-*
-* home PC
-global scripts_folder = "E:\OneDrive\Desktop\RAE"
-global data_folder = "D:\GoogleDrive\RAE"
 
 
 
