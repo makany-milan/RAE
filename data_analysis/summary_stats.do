@@ -22,7 +22,7 @@ keep if aff_authors > 20
 bys aff_inst_id: gen aff_works = _n
 keep if aff_works > 100
 
-keep if inst_country == "US"
+*keep if inst_country == "US"
 
 * generate dummy for gender
 gen female = 0 if p_female < 0 & !missing(p_female)
@@ -52,6 +52,9 @@ drop tag unique
 * active years
 su active_years if reltime==1, det
 *hist active_years if reltime == 1, bin(75)
+
+
+/*
 
 xi: reg waif i.author_id i.aff_inst_id if female == 1, cluster(aff_inst_id)
 
@@ -107,8 +110,8 @@ bys aff_inst_id: gen inst_id = _n
 twoway (histogram inst_fe if female==1 & author_inst_id == 1, bin(50) color(red)) ///
        (histogram inst_fe if female==0 & author_inst_id == 1, bin(50)), ///
 	   legend(order(1 "Female" 2 "Male" ))
+*/
 
-err
 
 * AKM
 xtset author_id reltime
@@ -121,7 +124,7 @@ twfe waif if female == 1, ids(author_id aff_inst_id) maxit(2000) matcheffect clu
 rename fe1 alpha_female
 rename fe2 phi_female
 
-reghdfe waif, absorb(i.author_id i.aff_inst_id i.year)
+*reghdfe waif, absorb(i.author_id i.aff_inst_id i.year)
 
 *twfe waif if female == 0, ids(author_id aff_inst_id) maxit(2000)
 *twfe waif if female == 1, ids(author_id aff_inst_id) maxit(2000)

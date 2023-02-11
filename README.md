@@ -15,6 +15,9 @@ The codes in the repository are used by the author to extract, process, and anal
 | [Web of Science Master Journal List](https://mjl.clarivate.com/collection-list-downloads) | The Master Journal List is an invaluable tool to help you to find the right journal for your needs across multiple indices hosted on the Web of Science platform.|
 | [Web of Science Journal Citation Reports](https://jcr.clarivate.com/jcr/browse-journals) | The Journal Citation Reports provides data on Journal Article Influence Scores and Journal Impact factor. This data can be useful to construct a measure of publication quality.|
 | [EconLit](https://www.aeaweb.org/econlit/journal_list.php) | EconLit provides the coverage most needed by scholars to make new discoveries, develop important insights, and contribute valuable research to the economics community.|
+| [QS Rankings](https://www.topuniversities.com/university-rankings)| QS Top Universities overall and economics specific university rankings |
+| [CWUR Rankings](https://cwur.org/)| CWUR overall and economics specific university rankings |
+| [THE Rankings](https://www.timeshighereducation.com/world-university-rankings)| Times Higher Education overall university rankings |
 | [Processed Data](https://drive.google.com/drive/folders/1V2oDuHfGY-sSDt4ECUGdFOV_83uO-ACO?usp=share_link) | Google Drive link to all the raw data files used for the analysis. Extracted and pre-processed from OpenAlex, journal data from WoS and EconLit. The data extraction is replicable and modifiable by altering the codes in */data_collection/* |
 
 
@@ -38,7 +41,9 @@ The codes in the repository are used by the author to extract, process, and anal
 3) Build a Panel Database - ***Stata*** - ***/data_preparation/***
     - Develop a running measure of contribution
     - Identify cross-institution movements
+    - Assing gender to authors
+    - Infer affiliations for missing years
+    - Merge affiliations
 4) Data Analysis - ***Stata*** - ***/data_analysis/***
     - Identify individual and institution effects
-
 5) Presentations & Working Paper - ***/presentations-paper/***
