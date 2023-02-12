@@ -124,6 +124,7 @@ twfe waif if female == 1, ids(author_id aff_inst_id) maxit(2000) matcheffect clu
 rename fe1 alpha_female
 rename fe2 phi_female
 
+
 *reghdfe waif, absorb(i.author_id i.aff_inst_id i.year)
 
 *twfe waif if female == 0, ids(author_id aff_inst_id) maxit(2000)
@@ -131,11 +132,16 @@ rename fe2 phi_female
 
 * keep one observations per author
 *bys author_id (year): gen unique_fe = _n
-egen tag = tag(author_id aff_inst_id)
+egen author_inst_tag = tag(author_id aff_inst_id)
 
-corr alpha_female phi_female if tag
-corr alpha_male phi_male if tag
+corr alpha_female phi_female if author_inst_tag
+corr alpha_male phi_male if author_inst_tag
 
+egen author_tag = tag(author_id)
+
+gen phi = phi_female
+replace phi = phi_male if missing(phi)
+ttest phi if author_tag, by(female)
 
 
 * time series
