@@ -2,13 +2,13 @@
 
 clear
 cd "$data_folder"
-use "panel"
+use "sample"
 
 cd "$scripts_folder"
-do "data_preparation/import_institutions"
+do  "data_preparation/import_institutions"
 
-* limit sample
-keep if inrange(year, 1960, 2023)
+* remove these conditions
+/*
 keep if num_pubs > 5
 
 bys author_id: egen moves = nvals(aff_inst_id)
@@ -23,10 +23,7 @@ bys aff_inst_id: gen aff_works = _n
 keep if aff_works > 100
 
 *keep if inst_country == "US"
-
-* generate dummy for gender
-gen female = 0 if p_female < 0 & !missing(p_female)
-replace female = 1 if p_female > 0 & !missing(p_female)
+*/
 
 
 * average number of years
@@ -143,14 +140,10 @@ gen phi = phi_female
 replace phi = phi_male if missing(phi)
 ttest phi if author_tag, by(female)
 
-err
 
 bys aff_inst_id: gen share_female = sum(female)/_N
 corr share_female phi_female if author_tag
 * super weak correlation... 
-
-corr phi_female share_female if inrange(phi_diff, -10,10)
-scatter share_female phi_diff if inrange(phi_diff, -10,10)
 
 
 collapse (firstnm) phi_female phi_male (mean) share_female=female, by(aff_inst_id)
@@ -158,7 +151,6 @@ gen phi_diff = phi_female - phi_male
 
 corr phi_diff share_female if inrange(phi_diff, -10,10)
 scatter share_female phi_diff if inrange(phi_diff, -10,10)
-
 
 
 * time series

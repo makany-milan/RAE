@@ -32,7 +32,13 @@ global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
 */
 
-/*
+*
+* laptop
+global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
+global data_folder = "G:\My Drive\RAE"
+*/
+
+*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -142,11 +148,20 @@ cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
 
 
+
 * 4d) Merge university rankings
 
 * 5) Analysis
 * Install TWFE
 capture ssc install TWFE
+
+* Construct sample for analysis
+cd "$scripts_folder"
+do "data_analysis/construct_sample.do" 
+
+* Run TWFE estimation
+cd "$scripts_folder"
+do "data_analysis/estimate_fe.do" 
 
 * 5a) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
