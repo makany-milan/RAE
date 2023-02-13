@@ -9,7 +9,7 @@ do "data_preparation/import_institutions"
 
 * limit sample
 keep if inrange(year, 1960, 2023)
-keep if num_pubs > 10
+keep if num_pubs > 5
 
 bys author_id: egen moves = nvals(aff_inst_id)
 replace moves = moves - 1
@@ -17,7 +17,7 @@ replace moves = moves - 1
 keep if moves > 1
 
 bys aff_inst_id: egen aff_authors = nvals(author_id)
-keep if aff_authors > 20
+keep if aff_authors > 5
 
 bys aff_inst_id: gen aff_works = _n
 keep if aff_works > 100
@@ -142,6 +142,23 @@ egen author_tag = tag(author_id)
 gen phi = phi_female
 replace phi = phi_male if missing(phi)
 ttest phi if author_tag, by(female)
+
+err
+
+bys aff_inst_id: gen share_female = sum(female)/_N
+corr share_female phi_female if author_tag
+* super weak correlation... 
+
+corr phi_female share_female if inrange(phi_diff, -10,10)
+scatter share_female phi_diff if inrange(phi_diff, -10,10)
+
+
+collapse (firstnm) phi_female phi_male (mean) share_female=female, by(aff_inst_id)
+gen phi_diff = phi_female - phi_male
+
+corr phi_diff share_female if inrange(phi_diff, -10,10)
+scatter share_female phi_diff if inrange(phi_diff, -10,10)
+
 
 
 * time series
