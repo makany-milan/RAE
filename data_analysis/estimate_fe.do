@@ -1,18 +1,50 @@
 * estimate fixed effects
-* Guimarães, P., Portugal, P., 2010. A Simple Feasible Procedure to fit Models with High-dimensional Fixed Effects. The Stata Journal 10, 628–649. https://doi.org/10.1177/1536867X1101000406
+* Guimarães, P., Portugal, P., 2010A Simple Feasible Procedure to fit Models with High-dimensional Fixed EffectsThe Stata Journal 10, 628–649https://doi.org/10.1177/1536867X1101000406
+
+* instead try
+* felsdvreg
+* felsdvreg y, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels) feff(fe2_fels) feffse(fe2_se_fels) cons
 
 * fe1: individual fixed effects: author_id
 * fe2: department fixed effects: aff_inst_id
 
-gen double temp = 0
-gen double alpha_i = 0
-gen double phi_k = 0
-local rss1 = 0
-local dif = 1
-local i = 0
+capture drop y temp fe1 fe2
+gen y = waif
+
+generate double temp=0
+generate double fe1=0
+
+generate double fe2=0
+
+
+
+local rss1=0
+local dif=1
+local i=0
+
+* demean variables
 
 while abs(`dif')>epsdouble() {
-    qui {
-	    reg y alpha_i phi_k
+	quietly {
+		regress y fe1 fe2
+		local rss2=`rss1'
+		local rss1=e(rss)
+		local dif=`rss2'-`rss1'
+		capture drop res
+		predict double res, res
+		replace temp=res+_b[fe1]*fe1, nopromote
+		capture drop fe1
+		egen double fe1=mean(temp), by(author_id)
+		replace temp=res+_b[fe2]*fe2, nopromote
+		capture drop fe2
+		egen double fe2=mean(temp), by(aff_inst_id)
+		local i=`i'+1
+		
+		if mod(`i', 10) == 0{
+				noisily: di "Iteration `i' - dif = `dif'"
+			}
+		}
 	}
 }
+
+display "Total Number of Iterations --> `i'"
