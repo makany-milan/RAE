@@ -4,11 +4,21 @@
 gsort author_id -aff_inst_id
 capture by author_id: replace aff_inst_id = aff_inst_id[1] if missing(aff_inst_id) & mover == 0 //  28.29% missing
 
+
 * fill institutions where the empty observations are not between moves
 
 bys author_id (year): gen author_paper_n = _n
-gen aff_inst_id_inf = aff_inst_id
+
+*gen aff_inst_id_inf = aff_inst_id
+
+* UNLESS YOU SPECIFY TO GENERATE THIS AS A DOUBLE IT FUCKS UP
+* GENERATES A HUGE LIST OF NEW INSTITUTIONS
+* VALUES ARE OFF BY 1 OR 2 AND HENCE FALSE MOVERS AND FALSE INSTITUTIONS
+
+gen double aff_inst_id_inf = .
 format aff_inst_id_inf %12.0g
+replace aff_inst_id_inf = aff_inst_id
+
 * for empty observations look in both directions to see whether value is filled or empty
 gen above_id = -1 if aff_inst_id != .
 gen below_id = -1 if aff_inst_id != .
@@ -48,6 +58,7 @@ gsort author_id +author_paper_n
 by author_id: replace aff_inst_id_inf = aff_inst_id[above_id] if missing(below_id) & !missing(above_id)
 * fill tail observations where below_id is empty
 by author_id: replace aff_inst_id_inf = aff_inst_id[below_id] if !missing(below_id) & missing(above_id)
+
 
 * fill those values where the above and below id is the same
 by author_id: replace aff_inst_id_inf = aff_inst_id[below_id] if aff_inst_id[above_id] == aff_inst_id[below_id] & missing(aff_inst_id_inf)

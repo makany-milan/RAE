@@ -2,8 +2,9 @@
 
 * if ec_prop is undefined use value here
 if missing("$ec_prop_cutoff") {
-    * using the arbitrary value of 50%
-    global ec_prop_cutoff = 0.5
+    * using the arbitrary value of 33.33%
+	* some authors like Acemoglu publish in Political science, etc.
+    global ec_prop_cutoff = 0.3333
 }
 
 

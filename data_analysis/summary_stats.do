@@ -2,12 +2,9 @@
 
 clear
 cd "$data_folder"
-use "sample"
+use "sample_fe"
 
-cd "$scripts_folder"
-do  "data_preparation/import_institutions"
-
-* remove these conditions
+* sample restrictions moved to "data_analysis/construct_sample"
 /*
 keep if num_pubs > 5
 
@@ -36,15 +33,9 @@ su active_years if reltime == 1, det
 drop if active_years == 1
 
 * count the number of authors and departments
-egen tag = tag(author_id)
-egen unique = total(tag)
-tab unique
-drop tag unique
+distinct author_id
 
-egen tag = tag(aff_inst_id)
-egen unique = total(tag)
-tab unique
-drop tag unique
+distinct aff_inst_id
 
 * active years
 su active_years if reltime==1, det
@@ -109,40 +100,29 @@ twoway (histogram inst_fe if female==1 & author_inst_id == 1, bin(50) color(red)
 	   legend(order(1 "Female" 2 "Male" ))
 */
 
-
-* AKM
-xtset author_id reltime
-
-twfe waif if female == 0, ids(author_id aff_inst_id) maxit(2000) matcheffect cluster(author_id aff_inst_id)
-rename fe1 alpha_male
-rename fe2 phi_male
-
-twfe waif if female == 1, ids(author_id aff_inst_id) maxit(2000) matcheffect cluster(author_id aff_inst_id)
-rename fe1 alpha_female
-rename fe2 phi_female
-
-
-*reghdfe waif, absorb(i.author_id i.aff_inst_id i.year)
-
-*twfe waif if female == 0, ids(author_id aff_inst_id) maxit(2000)
-*twfe waif if female == 1, ids(author_id aff_inst_id) maxit(2000)
-
 * keep one observations per author
 *bys author_id (year): gen unique_fe = _n
 egen author_inst_tag = tag(author_id aff_inst_id)
 
-corr alpha_female phi_female if author_inst_tag
-corr alpha_male phi_male if author_inst_tag
+corr alpha_i_female phi_k_female if author_inst_tag == 1
+corr alpha_i_male phi_k_male if author_inst_tag == 1
+
+* generate significance level for inst fixed effects
+gen phi_k_p = 1-normal((phi_k_male / phi_k_se_male ))
+replace phi_k_p = 1-normal((phi_k_female / phi_k_se_female )) if missing(phi_k_p)
+gen phi_k_significant = 1 if phi_k_p < .1
+
+corr alpha_i_female phi_k_female if author_inst_tag == 1 & phi_k_significant == 1
+corr alpha_i_male phi_k_male if author_inst_tag == 1 & phi_k_significant == 1
 
 egen author_tag = tag(author_id)
 
-gen phi = phi_female
-replace phi = phi_male if missing(phi)
-ttest phi if author_tag, by(female)
-
+gen phi = phi_k_female
+replace phi = phi_k_male if missing(phi)
+ttest phi if author_tag == 1, by(female)
 
 bys aff_inst_id: gen share_female = sum(female)/_N
-corr share_female phi_female if author_tag
+corr share_female phi_k_female if author_tag == 1
 * super weak correlation... 
 
 

@@ -104,9 +104,9 @@ save "openalex_data/authors_gender", replace
 
 * merge gender to panel
 clear
-use "panel"
+use "author_panel"
 merge m:1 author_id using "openalex_data/authors_gender" // 67.41%
 drop if _merge == 2
 drop _merge
 
-save "panel", replace
+save "author_panel", replace

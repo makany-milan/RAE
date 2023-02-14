@@ -1,20 +1,29 @@
 * estimate fixed effects
-* Guimarães, P., Portugal, P., 2010A Simple Feasible Procedure to fit Models with High-dimensional Fixed EffectsThe Stata Journal 10, 628–649https://doi.org/10.1177/1536867X1101000406
 
-* instead try
+
 * felsdvreg
+* Cornelissen, T., 2008. The Stata Command Felsdvreg to Fit a Linear Model with Two High-Dimensional Fixed Effects. The Stata Journal 8, 170–189. https://doi.org/10.1177/1536867X0800800202
+
+capture drop y
 
 gen y = waif
 
-felsdvreg y if female == 1, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels_female) feff(fe2_fels_female) feffse(fe2_se_fels_female) cons
-felsdvreg y if female == 0, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels_female) feff(fe2_fels_female) feffse(fe2_se_fels_female) cons
 
-err
+felsdvreg y if female == 1, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_female) feff(phi_k_female) feffse(phi_k_se_female) cons
+felsdvreg y if female == 0, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_male) feff(phi_k_male) feffse(phi_k_se_male) cons
+
+cd "$data_folder"
+save "sample_fe", replace
+
 * felsdvreg and zigzag seem to be converging to the same values while twfe is off by a large margin
 
 * fe1: individual fixed effects: author_id
 * fe2: department fixed effects: aff_inst_id
 
+
+* ZIGZAG
+* Guimarães, P., Portugal, P., 2010A Simple Feasible Procedure to fit Models with High-dimensional Fixed EffectsThe Stata Journal 10, 628–649https://doi.org/10.1177/1536867X1101000406
+/*
 capture drop y temp fe1 fe2
 
 generate double temp=0
@@ -54,3 +63,5 @@ while abs(`dif')>epsdouble() {
 }
 
 display "Total Number of Iterations --> `i'"
+
+*/

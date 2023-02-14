@@ -4,13 +4,17 @@
 
 clear
 cd "$data_folder"
-use "panel"
+use "author_panel"
 
-gen female = 1 if inrange(p_female, 0.9, 1)
-gen female = 0 if inrange(p_female, 0, 0.1)
+merge m:1 aff_inst_id using "openalex_data/institutions.dta"
+keep if _merge == 3
+drop _merge
+
+gen female = 1 if inrange(p_female, 0, 1)
+replace female = 0 if inrange(p_female, -1, 0)
 
 * limit sample to post 2000
-keep if inrange(year, 2000, 2023)
+keep if inrange(year, 2000, 2020)
 * keep author if they have at least 3 published works in the timeframe
 * this filters out inactive authors
 bys author_id: egen au_total_pubs_post00 = sum(year_author_pubs)
@@ -32,12 +36,12 @@ do "data_analysis/find_largest_connected_set.do"
 clear
 cd "$data_folder"
 use "sample"
-merge m:1 aff_inst_id author_id using "temp/largest_network"
+merge m:1 aff_inst_id author_id using "temp/largest_network_0", nogen update
+merge m:1 aff_inst_id author_id using "temp/largest_network_1", nogen update
 * keep observations belonging to the largest network
-keep if largest_network == 1 // 3130 observations dropped
-drop _merge
-drop largest_network
 
+keep if largest_network == 1 // 3130 observations dropped
+drop largest_network
 
 
 cd "$data_folder"

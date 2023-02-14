@@ -20,7 +20,7 @@ capture ssc install egenmore
 * GLOBAL SETTINGS
 * Classifications as economist: what proportion of publications is required to be
 * in economics to be treated as an economist
-global ec_prop_cutoff = 0.5
+global ec_prop_cutoff = 0.3333
 
 
 global scripts_folder = "C:\Users\u2048873\RAE"
@@ -55,9 +55,10 @@ global data_folder = "G:\My Drive\RAE"
 
 * 4) Import impact factor and other meaasures of journal quality
 *	4a) Merge journal rankings
-*	4b) Generate pub quality author-year panel
-* 	4c) Assign gender
-* 	4d) Merge university rankings
+*	4b) Disambiguate IDs
+*	4c) Generate pub quality author-year panel
+* 	4d) Assign gender
+* 	4e) Merge university rankings
 
 * 5) Analysis
 * 	5a) Generate summary statistics and descriptive graphs
@@ -74,6 +75,11 @@ global data_folder = "G:\My Drive\RAE"
 
 cd "$scripts_folder"
 do "data_processing/merge_journal_data.do" // 1,385 journals matched to OpenAlex
+
+* Import OpenAlex institutions
+cd "$scripts_folder"
+do  "data_preparation/import_institutions"
+
 
 * SOME NON-ECONOMICS JOURNALS ARE MISSING
 
@@ -104,25 +110,36 @@ do "data_preparation/import_works_and_affiliations.do"
 cd "$scripts_folder"
 do "data_preparation/merge_works_affiliations_journals.do"
 
+
 * drop useless variables
 drop see formerly publisheraddress webofsciencecategories 
+
+* 4b) Disambiguate IDs
+cd "$scripts_folder"
+do "data_preparation/fix_id_errors.do" 
+
 
 * 3a) Filter for economics authors
 cd "$scripts_folder"
 do "data_preparation/filter_econ_authors.do"
 
+* debug : no issues so far
 
 * 3b) Infer affiliation for missing observations
 cd "$data_folder"
 clear
 use "works"
 
+* FOUND A BUG!!!!
+* STATA GENERATES WRONG VALUES FOR INST_ID UNLESS DOUBLE IS SPECIFIES AS DATATYPE
 cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do"
 
+assert aff_inst_id !=  17866348
 
 cd "$data_folder"
 save "works", replace
+
 
 * WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
 * OF A CONSISTENT INSTITUTION
@@ -135,25 +152,31 @@ drop if missing(journal_name)
 cd "$scripts_folder"
 do "data_preparation/import_merge_jcr.do" 
 
-*/
 
 
-* 4b) Generate pub quality author-year panel
+* Generate top5 and co-author weighed variables
+cd "$scripts_folder"
+do "data_preparation/gen_weighed_vars.do" 
+
+
+* 4c) Generate pub quality author-year panel
 cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
 
 
-* 4c) Assign gender
+* 4d) Assign gender
 cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
 
 
+* 4e) Merge university rankings
 
-* 4d) Merge university rankings
 
 * 5) Analysis
 * Install TWFE
 *capture ssc install TWFE
+
+*/
 
 * Construct sample for analysis
 cd "$scripts_folder"
@@ -166,6 +189,9 @@ do "data_analysis/estimate_fe.do"
 * 5a) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
+
+assert aff_inst_id !=  17866348
+
 
 /*
 * format variables

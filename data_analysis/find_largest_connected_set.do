@@ -8,8 +8,7 @@ forvalues fem = 0/1 {
 
 	* find largest network of connected institutions
 	* should not lose too many observations here due to earlier sample restrictions
-	
-	keep if female == `fem'
+	qui: keep if female == `fem'
 	
 	keep aff_inst_id author_id
 	* keep one connection per author-institution pair
@@ -18,11 +17,11 @@ forvalues fem = 0/1 {
 	sort aff_inst_id author_id
 
 	* loop through all observations to construct the network of departments
-	bys author_id: gen author_n1 = 1 if _n == 1
-	replace author_n1 = 0 if missing(author_n1)
+	qui: bys author_id: gen author_n1 = 1 if _n == 1
+	qui: replace author_n1 = 0 if missing(author_n1)
 	gsort -author_n1 author_id
 
-	gen network = .
+	qui: gen network = .
 
 	* count observations where network is missing
 	count if missing(network)

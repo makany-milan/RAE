@@ -7,8 +7,6 @@ import delimited using "openalex_data/openalex-econ_affiliations.csv", delimiter
 
 * drop some corrupt observations
 drop if year > 2023
-* restrict the sample between 1950 and 2023
-drop if year < 1950
 
 * check the proportion of movers
 egen moves = nvals(aff_inst_id), by(author_id)
@@ -30,7 +28,7 @@ capture mkdir "affiliations"
 save "affiliations/affiliations.dta", replace
 
 * save file for those observations where we do not see within year movement
-egen withinyear = nvals(aff_inst_id), by(author_id year)
+bys author_id year: egen withinyear = nvals(aff_inst_id)
 keep if withinyear == 1
 * keep one record of affiliations from multiple publications
 bys year author_id: gen dupe = _n

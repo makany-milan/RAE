@@ -17,13 +17,17 @@ rename issn2 eissn
 * also change and thus appear as duplicates.
 * Remove duplicate observations
 * ? to-do: store journal and try merging based on issn and journal name
+* no dupes just empties...
+/*
 bys issn: gen _dupe = _n
-keep if _dupe == 1 & issn != ""
+keep if _dupe == 1 & issn == ""
 drop _dupe
 
 bys eissn: gen _dupe = _n
-keep if _dupe == 1 & issn != ""
+keep if _dupe == 1 & issn == ""
 drop _dupe
+*/
+drop if issn == "" & eissn == ""
 
 * Results without ISSN will not get matched during a merge 
 * but will avoid errors when performing 1:1 merges
@@ -164,16 +168,7 @@ rename temp eissn
 * Merge EconLit & WOS to OpenAlex based on journal name
 
 * Mark as economics journals based on journal name
-replace econ_journal = 1 if strpos(lower(journal_name), "economics")
-replace econ_journal = 1 if strpos(lower(journal_name), "econometrics")
-replace econ_journal = 1 if strpos(lower(journal_name), "economy")
-replace econ_journal = 1 if strpos(lower(journal_name), "economic")
-
-replace econ_journal = 1 if strpos(lower(journal_name), "economics")
-replace econ_journal = 1 if strpos(lower(journal_name), "econometrics")
-replace econ_journal = 1 if strpos(lower(journal_name), "economy")
-replace econ_journal = 1 if strpos(lower(journal_name), "economic")
-
+replace econ_journal = 1 if strpos(lower(journal_name), "econom")
 
 save "formatted/all_journals.dta", replace
 

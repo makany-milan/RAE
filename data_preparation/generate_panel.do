@@ -1,37 +1,11 @@
-* 4c) Generate pub quality author-year panel
+* 4c) Generate author-year & inst-year panels
 
+* author panel
 clear
 cd "$data_folder"
 use "works"
 
-* Generate variable for top5 publication
-gen top5 = 0
-replace top5 = 1 if journal_name == "Quarterly Journal of Economics"
-replace top5 = 1 if journal_name == "Econometrica"
-replace top5 = 1 if journal_name == "The American Economic Review"
-replace top5 = 1 if journal_name == "Journal of Political Economy"
-replace top5 = 1 if journal_name == "The Review of Economic Studies"
-
-* 2.52% of all publications in Top5
-
-* generate relative time t=1: time of first publication
-gsort author_id +year
-by author_id: gen first_pub = year[1]
-by author_id: gen reltime = (year - first_pub) + 1
-
-* some corrupt observations
-* some reltime values are unrealistic - data issues is reltime above 75 ?
-drop if reltime > 75
-
-gen waif = aif / number_of_authors
-gen wjif = jif / number_of_authors
-gen wjci = jci / number_of_authors
-gen wjifwsc = jifwithoutselfcites / number_of_authors
-gen wcitations = citations / number_of_authors
-gen wtop5 = top5 / number_of_authors
-
-gen wpubs = 1/number_of_authors
-gen author2= author_id
+capture gen author2= author_id
 
 collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
 xtset author_id year
@@ -52,4 +26,33 @@ do "data_preparation/infer_affiliation.do"
 
 
 cd "$data_folder"
-save "panel", replace
+save "author_panel", replace
+
+
+* institution panel
+clear
+cd "$data_folder"
+use "works"
+
+bys year aff_inst_id: egen nauthors = nvals(author_id)
+
+collapse (first) authors=nauthors (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) pubs = author_id, by(aff_inst_id year)
+
+xtset aff_inst_id year
+tsfill
+
+gsort aff_inst_id +year
+
+keep if inrange(year, 2000, 2023)
+egen inst_tag = tag(aff_inst_id)
+bys aff_inst_id: egen max_authors = max(authors)
+keep if max_authors > 15
+
+
+cd "$data_folder"
+save "inst_panel", replace
+
+
+cd "$scripts_folder"
+do  "data_preparation/import_institutions"
+
