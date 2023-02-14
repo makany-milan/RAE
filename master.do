@@ -38,7 +38,7 @@ global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
 
-*
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -153,7 +153,7 @@ do "data_preparation/assign_gender.do"
 
 * 5) Analysis
 * Install TWFE
-capture ssc install TWFE
+*capture ssc install TWFE
 
 * Construct sample for analysis
 cd "$scripts_folder"

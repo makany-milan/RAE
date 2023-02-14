@@ -6,6 +6,9 @@ clear
 cd "$data_folder"
 use "panel"
 
+gen female = 1 if inrange(p_female, 0.9, 1)
+gen female = 0 if inrange(p_female, 0, 0.1)
+
 * limit sample to post 2000
 keep if inrange(year, 2000, 2023)
 * keep author if they have at least 3 published works in the timeframe

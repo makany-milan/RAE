@@ -3,13 +3,19 @@
 
 * instead try
 * felsdvreg
-* felsdvreg y, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels) feff(fe2_fels) feffse(fe2_se_fels) cons
+
+gen y = waif
+
+felsdvreg y if female == 1, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels_female) feff(fe2_fels_female) feffse(fe2_se_fels_female) cons
+felsdvreg y if female == 0, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(fe1_fels_female) feff(fe2_fels_female) feffse(fe2_se_fels_female) cons
+
+err
+* felsdvreg and zigzag seem to be converging to the same values while twfe is off by a large margin
 
 * fe1: individual fixed effects: author_id
 * fe2: department fixed effects: aff_inst_id
 
 capture drop y temp fe1 fe2
-gen y = waif
 
 generate double temp=0
 generate double fe1=0
