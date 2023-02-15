@@ -24,7 +24,6 @@ keep if aff_works > 100
 
 
 * average number of years
-*capture ssc install schemepack
 set scheme white_tableau
 bys author_id (reltime): gen active_years = _N
 su active_years if reltime == 1, det
@@ -125,12 +124,13 @@ bys aff_inst_id: gen share_female = sum(female)/_N
 corr share_female phi_k_female if author_tag == 1
 * super weak correlation... 
 
+gen phi_diff = phi_k_female - phi_k_male
 
-collapse (firstnm) phi_female phi_male (mean) share_female=female, by(aff_inst_id)
-gen phi_diff = phi_female - phi_male
+egen inst_tag = tag(aff_inst_id)
+ 
 
-corr phi_diff share_female if inrange(phi_diff, -10,10)
-scatter share_female phi_diff if inrange(phi_diff, -10,10)
+corr phi_diff share_female if inrange(phi_diff, -10,10) & inst_tag == 1
+scatter share_female phi_diff if inrange(phi_diff, -10,10) & inst_tag == 1
 
 
 * time series

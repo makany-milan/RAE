@@ -14,6 +14,9 @@ set varabbrev off
 /*
 * Install packages
 capture ssc install egenmore
+capture ssc install TWFE
+capture ssc install felsdvreg
+capture ssc install schemepack
 */
 
 
@@ -23,17 +26,18 @@ capture ssc install egenmore
 global ec_prop_cutoff = 0.3333
 
 
+* warwick pc
 global scripts_folder = "C:\Users\u2048873\RAE"
 global data_folder = "D:\rae_data"
 
-/*
+*
 * home PC
 global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
 */
 
 *
-* laptop
+/* laptop
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
@@ -173,8 +177,7 @@ do "data_preparation/assign_gender.do"
 
 
 * 5) Analysis
-* Install TWFE
-*capture ssc install TWFE
+
 
 */
 
@@ -190,7 +193,6 @@ do "data_analysis/estimate_fe.do"
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
 
-assert aff_inst_id !=  17866348
 
 
 /*
