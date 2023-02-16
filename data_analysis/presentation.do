@@ -42,7 +42,7 @@ keep if inrange(year, 1990, 2020)
 
 collapse (mean) aif=aif waif=waif (p10) lbaif=aif lbwaif=waif (p90) ubaif=aif ubwaif=waif if waif > 0, by(female year)
 
-twoway (tsline waif if female == 1) || tsrline lbwaif ubwaif if female == 1
+twoway (tsline aif if female == 1) (tsline aif if female == 0)
 
 * research output
 clear
