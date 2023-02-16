@@ -116,17 +116,15 @@ corr alpha_i_male phi_k_male if author_inst_tag == 1 & phi_k_significant == 1
 
 egen author_tag = tag(author_id)
 
-gen phi = phi_k_female
-replace phi = phi_k_male if missing(phi)
+bys aff_inst_id: gen phi = phi_k_female
+bys aff_inst_id: replace phi = phi_k_male if missing(phi)
 ttest phi if author_tag == 1, by(female)
 
 bys aff_inst_id: gen share_female = sum(female)/_N
 corr share_female phi_k_female if author_tag == 1
 * super weak correlation... 
 
-gen phi_diff = phi_k_female - phi_k_male
-
-egen inst_tag = tag(aff_inst_id)
+bys aff_inst_id: gen phi_diff = phi - phi_k_male if female == 1
  
 
 corr phi_diff share_female if inrange(phi_diff, -10,10) & inst_tag == 1

@@ -30,14 +30,14 @@ global ec_prop_cutoff = 0.3333
 global scripts_folder = "C:\Users\u2048873\RAE"
 global data_folder = "D:\rae_data"
 
-*
+/*
 * home PC
 global scripts_folder = "E:\OneDrive\Desktop\RAE"
 global data_folder = "D:\GoogleDrive\RAE"
 */
 
 *
-/* laptop
+* laptop
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
