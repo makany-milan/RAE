@@ -177,10 +177,6 @@ do "data_preparation/assign_gender.do"
 
 
 * 5) Analysis
-
-
-*/
-
 * Construct sample for analysis
 cd "$scripts_folder"
 do "data_analysis/construct_sample.do" 
@@ -193,7 +189,7 @@ do "data_analysis/estimate_fe.do"
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
 
-
+*/
 
 /*
 * format variables
