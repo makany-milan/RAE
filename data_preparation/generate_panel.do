@@ -25,6 +25,34 @@ cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do" 
 
 
+* filter out anomalies in affiliation
+* some people move back and forth in 1 year - replace these affiliations
+gsort author_id +year
+by author_id: gen move = 1 if aff_inst_id[_n] != aff_inst_id[_n-1] & _n != 1 & _n != _N
+by author_id: gen anomaly = 1 if move == 1 & (aff_inst_id[_n] != aff_inst_id[_n-1] & aff_inst_id[_n] != aff_inst_id[_n+1])
+replace aff_inst_id = . if anomaly == 1
+* if the institutions surrounding the obs is the same replace to that
+by author_id: replace aff_inst_id = aff_inst_id[_n-1] if anomaly == 1 & missing(aff_inst_id) & (aff_inst_id[_n-1] == aff_inst_id[_n+1])
+* if the institutions surrounding the obs is not the same replace with p=1/2
+gen repprob = runiform() if anomaly == 1
+
+by author_id: replace aff_inst_id = aff_inst_id[_n-1] if anomaly == 1 & missing(aff_inst_id) & repprob < .5
+by author_id: replace aff_inst_id = aff_inst_id[_n+1] if anomaly == 1 & missing(aff_inst_id) & repprob > .5
+
+drop num_pubs author_paper_n
+* Infer affiliation for missing observations
+cd "$scripts_folder"
+do "data_preparation/infer_affiliation.do" 
+
+err
+
+drop repprob
+
+
+
+* some people have multiple affiliations
+
+err
 cd "$data_folder"
 save "author_panel", replace
 
@@ -42,12 +70,6 @@ xtset aff_inst_id year
 tsfill
 
 gsort aff_inst_id +year
-
-keep if inrange(year, 2000, 2023)
-egen inst_tag = tag(aff_inst_id)
-bys aff_inst_id: egen max_authors = max(authors)
-keep if max_authors > 15
-
 
 cd "$data_folder"
 save "inst_panel", replace
