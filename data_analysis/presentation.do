@@ -14,6 +14,23 @@ tsset year
 twoway tsline female
 
 
+* number of pubs
+clear
+cd "$data_folder"
+use "author_panel"
+
+set scheme white_tableau
+
+capture gen female = 1 if inrange(p_female, 0, 1)
+replace female = 0 if inrange(p_female, -1, 0)
+
+keep if inrange(year, 1990, 2020)
+
+collapse (mean) pubs=year_author_pubs avg_coauthors=avg_coauthors if year_author_pubs > 0, by(female year)
+xtset female year
+twoway (tsline pubs if female == 1, color(red)) (tsline pubs if female == 0, color(blue)) (tsline avg_coauthors if female == 1, color(red) lp(dash)) (tsline avg_coauthors if female == 0, color(blue) lp(dash)) 
+
+
 * do women get cited more?
 clear
 cd "$data_folder"
