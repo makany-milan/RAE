@@ -242,8 +242,8 @@ if __name__ == '__main__':
     parser.add_argument('--single', '-s', action='store', default=False, dest='single')
     
     #args = parser.parse_args()
-    args_raw = ['--folder', 'C:\\Users\\Milan\\OneDrive\\Desktop\\Study\\universities']
-    args = parser.parse_args(args_raw)
+    #args_raw = ['--folder', 'C:\\Users\\Milan\\OneDrive\\Desktop\\Study\\universities']
+    args = parser.parse_args()
 
     path = Path(args.folder)
     export_loc = (path / 'merge.csv').resolve()

@@ -42,7 +42,7 @@ global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
 
-*
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -62,12 +62,16 @@ global data_folder = "G:\My Drive\RAE"
 *	4b) Disambiguate IDs
 *	4c) Generate pub quality author-year panel
 * 	4d) Assign gender
+* 	4e) Import university rankings
 * 	4e) Merge university rankings
+*	4g) Collapse rankings
 
 * 5) Analysis
-* 	5a) Generate summary statistics and descriptive graphs
-
-
+* 	5a) Construct sample for analysis
+*	5b) Construct Latent Classes
+*	5c) Confirm connected set of latent types
+*	5d) Run TWFE estimation
+*	5e) Generate summary statistics and descriptive graphs
 
 
 * 1) Collect data from OpenAlex
@@ -173,25 +177,44 @@ cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
 
 
-* 4e) Merge university rankings
+/*
+* 4e) Import university rankings
 cd "$scripts_folder"
-do "data_preparation/merge_rankings.do"
+do "data_preparation/import_rankings.do"
+*/
+
+* 4f) Merge university rankings
+cd "$scripts_folder"
+do "data_preparation/merge_rankings.do" 
 
 
+
+*/
 * 5) Analysis
-* Construct sample for analysis
+* 5a) Construct sample for analysis
 cd "$scripts_folder"
-do "data_analysis/construct_sample.do" 
+do "data_analysis/construct_sample.do"
 
-* Run TWFE estimation
+
+* 5b) Construct Latent Classes
+* Create single metric based on QS, THE, CWUR
+cd "$scripts_folder"
+do "data_analysis/constuct_latent_classes.do" 
+
+* 5c) Confirm connected set of latent types
+* We need movement in both directions between sets
+cd "$scripts_folder"
+do "data_analysis/confirm_connected.do"
+
+* 5d) Run TWFE estimation
 cd "$scripts_folder"
 do "data_analysis/estimate_fe.do" 
 
-* 5a) Generate summary statistics and descriptive graphs
+* 5e) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
 do "data_analysis/summary_stats.do" 
 
-*/
+
 
 /*
 * format variables

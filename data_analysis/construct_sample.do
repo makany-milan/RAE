@@ -28,21 +28,3 @@ keep if inst_total_authors_post00 >= 15
 
 cd "$data_folder"
 save "sample", replace
-
-cd "$scripts_folder"
-do "data_analysis/find_largest_connected_set.do"
-
-
-clear
-cd "$data_folder"
-use "sample"
-merge m:1 aff_inst_id author_id using "temp/largest_network_0", nogen update
-merge m:1 aff_inst_id author_id using "temp/largest_network_1", nogen update
-* keep observations belonging to the largest network
-
-keep if largest_network == 1 // 3130 observations dropped
-drop largest_network
-
-
-cd "$data_folder"
-save "sample", replace

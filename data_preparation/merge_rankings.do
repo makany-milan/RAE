@@ -1,23 +1,23 @@
-* Merge rankigns to list of universities
+* 4f) Merge university rankings
 
-clear
 cd "$data_folder"
-use "works"
+clear
+use "author_panel"
 
-merge m:1 aff_inst_id using "openalex_data/institutions.dta", keepusing(inst_name)
+merge m:1 aff_inst_id using "openalex_data/institutions.dta"
 keep if _merge == 3
+drop _merge
 
-collapse (first) inst_name, by(aff_inst_id)
+recast str200 inst_name
+merge m:1 inst_name using "rankings/merge", keepusing(university_matched)
+drop if _merge == 2
+drop _merge
 
-rename inst_name university
+merge m:1 university_matched using "rankings/rankings"
+drop if _merge == 2
+drop _merge
+drop university_matched 
 
-capture mkdir "universities"
 
-export delimited using "universities/master_data.csv", replace
-
-* run python script to merge data
-* this script does not have to be executed every time.
-/*
-cd "$scripts_folder"
-python script data_preparation/merge_universities.py, args(--folder "$data_folder/universities")
-*/
+cd "$data_folder"
+save "author_panel", replace
