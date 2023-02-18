@@ -42,7 +42,7 @@ global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
 
-/*
+*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -174,6 +174,8 @@ do "data_preparation/assign_gender.do"
 
 
 * 4e) Merge university rankings
+cd "$scripts_folder"
+do "data_preparation/merge_rankings.do"
 
 
 * 5) Analysis

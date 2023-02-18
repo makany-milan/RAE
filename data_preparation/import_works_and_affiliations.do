@@ -5,6 +5,9 @@ clear
 cd "$data_folder"
 import delimited using "openalex_data/openalex-econ_affiliations.csv", delimiter(";") encoding(utf-8) bindquotes(strict) maxquotedrows(unlimited)
 
+format aff_inst_id %12.0g
+format author_id %12.0g
+
 * drop some corrupt observations
 drop if year > 2023
 
@@ -59,5 +62,9 @@ keep if dupe == 1
 drop dupe
 
 bys paper_id: gen number_of_authors = _N
+
+format author_id %12.0g
+format paper_id %12.0g
+format journal_id %12.0g
 
 save "works.dta", replace

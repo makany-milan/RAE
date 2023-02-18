@@ -4,6 +4,9 @@ clear
 cd "$data_folder"
 use "works.dta"
 
+format paper_id %12.0g
+format author_id %12.0g
+
 * merge to affiliations based on publication and author
 merge 1:1 paper_id author_id using "affiliations/affiliations.dta", update // 18.21% has affiliation
 drop if _merge == 2
@@ -46,6 +49,7 @@ bys author_id: egen n_inst = nvals(aff_inst_id), missing
 assert n_inst != .
 drop n_inst
 
+format journal_id %12.0g
 
 * merge publications to journals
 merge m:1 journal_id using "journals/econ_journals.dta", update

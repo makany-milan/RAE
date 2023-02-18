@@ -60,6 +60,75 @@ bys issn: replace issn = "econl"+string(_n) if issn == ""
 
 save "formatted/econlit.dta", replace
 
+**#
+* Import Scopus data
+* Save observations with ISSN numbers
+* Save observations with ISSN or eISSN numbers
+clear
+import delimited using scopus.csv, varnames(1)
+ren sourcerecordid scopus_id
+ren sourcetitlemedlinesourcedjournal journal_name
+ren allsciencejournalclassificationc asjc_codes
+ren printissn issn
+replace issn = substr(issn, 1,4) + "-"+ substr(issn, 5,.) if !missing(issn)
+replace eissn = substr(eissn, 1,4) + "-"+ substr(eissn, 5,.) if !missing(eissn)
+
+bys issn: replace issn = "scopus"+string(_n) if issn == ""
+bys eissn: replace eissn = "scopus"+string(_n) if eissn == ""
+
+bys issn: gen dupe = _n
+keep if dupe == 1
+drop dupe
+
+keep scopus_id journal_name issn eissn asjc_codes
+save "formatted/scopus.dta", replace
+
+/*
+**#
+* Import respec data
+* Can only merge based on name
+clear
+import delimited using respec.csv, varnames(1) bindquote(strict)
+ren rank scopus_rank
+ren journals journal_name
+
+
+save "formatted/respec.dta", replace
+*/
+
+
+**#
+* Import scimagojr data
+* Save observations with ISSN numbers
+* Save observations with ISSN or eISSN numbers
+clear
+import delimited using scimagojr.csv, varnames(1)
+split issn, p(", ")
+ren issn issn_raw
+ren issn1 issn
+ren issn2 eissn
+
+replace issn = substr(issn, 1,4) + "-"+ substr(issn, 5,.) if !missing(issn)
+replace eissn = substr(eissn, 1,4) + "-"+ substr(eissn, 5,.) if !missing(eissn)
+
+ren sourceid scimagojr_id
+ren title journal_name
+
+destring sjr, i(",") replace
+destring citesdoc2years, i(",") replace
+destring refdoc , i(",") replace
+
+bys issn: replace issn = "scimagojr"+string(_n) if issn == ""
+bys eissn: replace eissn = "scimagojr"+string(_n) if eissn == ""
+
+bys issn: gen dupe = _n
+keep if dupe == 1
+drop dupe
+
+keep scimagojr_id journal_name issn eissn sjr hindex totaldocs2021 totaldocs3years totalrefs totalcites3years citabledocs3years citesdoc2years refdoc
+
+save "formatted/scimagojr.dta", replace
+
 
 **#
 * Import WOS data
@@ -107,30 +176,46 @@ save "formatted/wos_emerging.dta", replace
 
 
 **#
-* Merge EconLit & WOS to OpenAlex based on ISSN
+* Merge EconLit, WOS, Scopus & scimagojr to OpenAlex based on ISSN
 
 * Combine WOS files
 clear
 use "formatted/wos_social.dta"
-merge 1:1 issn using "formatted/wos_emerging.dta"
+merge 1:1 issn using "formatted/wos_emerging.dta", update
 * Confirm that all observations are unique
 assert _merge != 3
 drop _merge
 * Merge to EconLit
-merge 1:1 issn using "formatted/econlit.dta"
+merge 1:1 issn using "formatted/econlit.dta", update
 drop _merge
 count // 2,025
-save "formatted/wos_econlit.dta", replace
+* Merge to Scopus
+merge 1:1 issn using "formatted/scopus.dta", update
+drop _merge
+count //  3,380
+* Merge to scimagojr
+merge 1:1 issn using "formatted/scimagojr.dta", update
+drop _merge
+count // 3,902
+
+*replace dupelicated eissn numbers
+bys eissn: gen dupe = _n
+replace eissn = "eissn_merged"+string(_n) if dupe > 1
+drop dupe
+
+save "formatted/raw_merge.dta", replace
+
+
 
 * Merge with OpenAlex
 clear
 use "formatted/openalex_journals_data.dta"
 gen econ_journal = 0
-merge 1:1 issn using "formatted/wos_econlit.dta", update // 650 matches
+merge 1:1 issn using "formatted/raw_merge.dta", update // 650 matches
 drop if _merge == 2
 replace econ_journal = 1 if _merge == 3
 drop _merge
-merge 1:1 eissn using "formatted/wos_econlit.dta", update // 9 matches
+merge 1:1 eissn using "formatted/raw_merge.dta", update // 9 matches
 drop if _merge == 2
 replace econ_journal = 1 if _merge == 3
 drop _merge
@@ -140,7 +225,7 @@ drop _merge
 * incorrectly store values
 rename issn temp
 rename eissn issn
-merge 1:1 issn using "formatted/wos_econlit.dta", update //  629 matches
+merge 1:1 issn using "formatted/raw_merge.dta", update //  629 matches
 * Remove brought over variable
 drop eissn
 drop if _merge == 2
@@ -153,7 +238,7 @@ rename temp issn
 
 rename eissn temp
 rename issn eissn
-merge 1:1 eissn using "formatted/wos_econlit.dta", update // 275 matches
+merge 1:1 eissn using "formatted/raw_merge.dta", update // 275 matches
 * Remove brought over variable
 drop issn
 drop if _merge == 2
@@ -173,7 +258,7 @@ replace econ_journal = 1 if strpos(lower(journal_name), "econom")
 save "formatted/all_journals.dta", replace
 
 * Save merged Economics journals
-keep if econ_journal == 1 // 1287 journals matched
+keep if econ_journal == 1 // 2634 journals matched
 
 format journal_id %12.0g
 
