@@ -198,6 +198,9 @@ do "data_analysis/construct_sample.do"
 
 * 5b) Construct Latent Classes
 * Create single metric based on QS, THE, CWUR
+* get regions from here:
+* https://country-code.cl/
+* construct: UK US EU NA REST, TOP5 TOP25 TOP50
 cd "$scripts_folder"
 do "data_analysis/constuct_latent_classes.do" 
 
