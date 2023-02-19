@@ -1,18 +1,18 @@
-* Summary statistics for moves and productivity metrics
+* 5e) Generate summary statistics and descriptive graphs
 
 clear
 cd "$data_folder"
-use "author_panel"
+use "sample_fe"
 
-keep if inrange(year, 2000,2020)
 
-* find moves
-bys author_id: gen move = 1 if aff_inst_id[_n] != aff_inst_id[_n-1] & _n != 1 & _n != _N
-bys author_id: egen number_of_moves = sum(move)
+set scheme white_tableau
 
-egen author_tag = tag(author_id)
+* count the number of authors and departments
+distinct author_id
+distinct aff_inst_id
 
-order move number_of_moves 
+* create tag for more period dynamic model
+egen author_global_class_tag = tag(author_id GLOBAL_CLASS)
 
-count if number_of_moves > 5 & author_tag == 1 // 1423 people move than 5 times?
-* unrealistic
+corr alpha_i_female phi_k_female if author_global_class_tag == 1
+corr alpha_i_male phi_k_male if author_global_class_tag == 1

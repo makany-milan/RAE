@@ -107,7 +107,7 @@ count if number_of_moves> insts
 * merge uni name
 cd "$data_folder"
 merge m:1 aff_inst_id using "openalex_data/institutions.dta", keepusing(inst_name)
-keep if _merge == 3
+drop if _merge == 2
 drop _merge
 
 cd "$data_folder"

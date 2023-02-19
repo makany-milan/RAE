@@ -1,16 +1,24 @@
-* estimate fixed effects
+* 5d) Run TWFE estimation
 
 
 * felsdvreg
 * Cornelissen, T., 2008. The Stata Command Felsdvreg to Fit a Linear Model with Two High-Dimensional Fixed Effects. The Stata Journal 8, 170–189. https://doi.org/10.1177/1536867X0800800202
 
-capture drop y
 
+clear
+cd "$data_folder"
+use "sample"
+
+* merge institution latent types
+merge m:1 aff_inst_id using "classes/global-regional-classes", keepusing(GLOBAL_CLASS REGION_CLASS)
+
+
+capture drop y
 gen y = waif
 
 
-felsdvreg y if female == 1, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_female) feff(phi_k_female) feffse(phi_k_se_female) cons
-felsdvreg y if female == 0, ivar(author_id) jvar(aff_inst_id) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_male) feff(phi_k_male) feffse(phi_k_se_male) cons
+felsdvreg y if female == 1, ivar(author_id) jvar(GLOBAL_CLASS) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_female) feff(phi_k_female) feffse(phi_k_se_female) cons
+felsdvreg y if female == 0, ivar(author_id) jvar(GLOBAL_CLASS) xb(none) res(none2) mover(mover) mnum(moves_n) pobs(none3) group(group) peff(alpha_i_male) feff(phi_k_male) feffse(phi_k_se_male) cons
 
 cd "$data_folder"
 save "sample_fe", replace

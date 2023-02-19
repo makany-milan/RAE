@@ -1,4 +1,6 @@
-* 5a) Generate summary statistics and descriptive graphs
+* OLD VERSION
+err
+* 5e) Generate summary statistics and descriptive graphs
 
 clear
 cd "$data_folder"

@@ -42,7 +42,7 @@ global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
 
-/*
+*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -65,6 +65,7 @@ global data_folder = "G:\My Drive\RAE"
 * 	4e) Import university rankings
 * 	4e) Merge university rankings
 *	4g) Collapse rankings
+*	4g) Construct regions for institution classes
 
 * 5) Analysis
 * 	5a) Construct sample for analysis
@@ -187,9 +188,12 @@ do "data_preparation/import_rankings.do"
 cd "$scripts_folder"
 do "data_preparation/merge_rankings.do" 
 
-
+* 4g) Construct regions for institution classes
+cd "$scripts_folder"
+do "data_preparation/construct_regions.do" 
 
 */
+
 * 5) Analysis
 * 5a) Construct sample for analysis
 cd "$scripts_folder"
@@ -198,8 +202,6 @@ do "data_analysis/construct_sample.do"
 
 * 5b) Construct Latent Classes
 * Create single metric based on QS, THE, CWUR
-* get regions from here:
-* https://country-code.cl/
 * construct: UK US EU NA REST, TOP5 TOP25 TOP50
 cd "$scripts_folder"
 do "data_analysis/constuct_latent_classes.do" 
@@ -209,13 +211,14 @@ do "data_analysis/constuct_latent_classes.do"
 cd "$scripts_folder"
 do "data_analysis/confirm_connected.do"
 
+
 * 5d) Run TWFE estimation
 cd "$scripts_folder"
 do "data_analysis/estimate_fe.do" 
 
 * 5e) Generate summary statistics and descriptive graphs
 cd "$scripts_folder"
-do "data_analysis/summary_stats.do" 
+do "data_analysis/summary_stats2.do" 
 
 
 
