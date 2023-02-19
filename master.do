@@ -42,7 +42,7 @@ global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
 
-*
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -173,6 +173,7 @@ cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
 
 
+
 * 4d) Assign gender
 cd "$scripts_folder"
 do "data_preparation/assign_gender.do"
@@ -192,7 +193,9 @@ do "data_preparation/merge_rankings.do"
 cd "$scripts_folder"
 do "data_preparation/construct_regions.do" 
 
+
 */
+
 
 * 5) Analysis
 * 5a) Construct sample for analysis
@@ -204,7 +207,7 @@ do "data_analysis/construct_sample.do"
 * Create single metric based on QS, THE, CWUR
 * construct: UK US EU NA REST, TOP5 TOP25 TOP50
 cd "$scripts_folder"
-do "data_analysis/constuct_latent_classes.do" 
+do "data_analysis/construct_latent_classes.do" 
 
 * 5c) Confirm connected set of latent types
 * We need movement in both directions between sets

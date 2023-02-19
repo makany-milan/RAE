@@ -44,9 +44,10 @@ bys aff_inst_id: replace aff_inst_id = . if _N < 5
 
 drop insts inst_name
 bys author_id: egen insts = nvals(aff_inst_id)
+bys author_id: egen ninsts = max(insts)
 * get rid of people with only NBER, CEPR, IFO, Catalyst affiliation
-drop if insts == .
-drop insts
+drop if ninsts == .
+drop insts ninsts
 
 * Infer affiliation for missing observations
 cd "$scripts_folder"
@@ -94,7 +95,8 @@ capture drop author_paper_n
 capture drop aff_inst_id_inf
 capture drop below_id
 capture drop above_id
-* replace federal reserve insts
+* make sure data is complete
+tsfill
 * Infer affiliation for missing observations
 cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do" 
@@ -109,6 +111,7 @@ cd "$data_folder"
 merge m:1 aff_inst_id using "openalex_data/institutions.dta", keepusing(inst_name)
 drop if _merge == 2
 drop _merge
+
 
 cd "$data_folder"
 save "author_panel", replace

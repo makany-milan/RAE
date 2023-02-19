@@ -4,9 +4,13 @@
 gsort author_id -aff_inst_id
 capture by author_id: replace aff_inst_id = aff_inst_id[1] if missing(aff_inst_id) & mover == 0 //  28.29% missing
 
+capture drop author_paper_n
+capture drop aff_inst_id_inf
+capture drop above_id
+capture drop below_id
+capture drop num_pubs
 
 * fill institutions where the empty observations are not between moves
-
 bys author_id (year): gen author_paper_n = _n
 
 *gen aff_inst_id_inf = aff_inst_id
@@ -28,7 +32,7 @@ bys author_id: gen num_pubs = _N
 
 * loop through all potential values
 qui: su num_pubs
-local max_dist = ceil((`r(max)'- 1) / 2)
+local max_dist = `r(max)'
 *local max_dist = 5 // short loop for debugging purposes
 
 * sort database
