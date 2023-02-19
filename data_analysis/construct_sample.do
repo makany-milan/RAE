@@ -36,6 +36,7 @@ drop inst_issue
 cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do" 
 
+err // here
 count if author_id == 2386324
 assert `r(N)' == 21
 
