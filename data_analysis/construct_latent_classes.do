@@ -7,7 +7,7 @@ clear
 cd "$data_folder"
 use "sample"
 
-collapse (first) inst_name qs_econ_2021_rank qs_overall_2022_rank qs_econ_citations qs_faculty_student_ratio_score qs_size cwur_worldrank the_ec_rank the_ec_industry_income the_research_rank the_citations inst_country (count) authors=author_id (sum) aif top5s (mean) max_age avg_coauthors female, by(aff_inst_id)
+collapse (first) inst_name qs_econ_2021_rank qs_overall_2022_rank qs_econ_citations qs_faculty_student_ratio_score qs_size cwur_worldrank the_ec_rank the_ec_industry_income the_research_rank the_citations inst_country (count) authors=author_id (sum) aif top5s (mean) avg_coauthors female, by(aff_inst_id)
 
 gsort +qs_econ_2021_rank
 
@@ -39,8 +39,48 @@ gen global_rank = _n if !missing(global_rank_avg)
 *gsort +global_rank
 *edit inst_name global_rank global_rank_avg qs_econ_2021_rank the_ec_rank region
 
+
+/*
+* 4 global classes
 gen GLOBAL_CLASS = .
-la de glob_classes 1 "TOP10" 2 "TOP25" 3 "TOP50" 4 "TOP100" 5 "TOP150" 6 "TOP200" 7 "TOP250" 8 "BOTTOM"
+la de glob_classes 1 "TOP50" 2 "TOP100" 3 "TOP200" 4 "REST"
+la val GLOBAL_CLASS glob_classes
+
+
+replace GLOBAL_CLASS = 1 if inrange(global_rank, 1, 50)
+replace GLOBAL_CLASS = 2 if inrange(global_rank, 51, 100)
+replace GLOBAL_CLASS = 3 if inrange(global_rank, 101, 200)
+replace GLOBAL_CLASS = 4 if inrange(global_rank, 201, .)
+replace GLOBAL_CLASS = 4 if missing(global_rank)
+
+assert GLOBAL_CLASS != .
+*/
+
+*
+* 8 global classes
+gen GLOBAL_CLASS = .
+la de glob_classes 1 "TOP25" 2 "TOP50" 3 "TOP100" 4 "TOP200" 5 "TOP300" 6 "TOP400" 7 "TOP500" 8 "BOTTOM"
+la val GLOBAL_CLASS glob_classes
+
+
+replace GLOBAL_CLASS = 1 if inrange(global_rank, 1, 25)
+replace GLOBAL_CLASS = 2 if inrange(global_rank, 26, 60)
+replace GLOBAL_CLASS = 3 if inrange(global_rank, 51, 100)
+replace GLOBAL_CLASS = 4 if inrange(global_rank, 101, 200)
+replace GLOBAL_CLASS = 5 if inrange(global_rank, 201, 300)
+replace GLOBAL_CLASS = 6 if inrange(global_rank, 301, 400)
+replace GLOBAL_CLASS = 7 if inrange(global_rank, 401, 500)
+replace GLOBAL_CLASS = 8 if inrange(global_rank, 501, .)
+replace GLOBAL_CLASS = 8 if missing(global_rank)
+
+assert GLOBAL_CLASS != .
+*/
+
+
+* 11 global classes
+/*
+gen GLOBAL_CLASS = .
+la de glob_classes 1 "TOP10" 2 "TOP25" 3 "TOP50" 4 "TOP100" 5 "TOP150" 6 "TOP200" 7 "TOP250" 8 "TOP300" 9 "TOP400" 10 "TOP500" 11 "BOTTOM"
 la val GLOBAL_CLASS glob_classes
 
 
@@ -51,10 +91,14 @@ replace GLOBAL_CLASS = 4 if inrange(global_rank, 51, 100)
 replace GLOBAL_CLASS = 5 if inrange(global_rank, 101, 150)
 replace GLOBAL_CLASS = 6 if inrange(global_rank, 151, 200)
 replace GLOBAL_CLASS = 7 if inrange(global_rank, 201, 250)
-replace GLOBAL_CLASS = 8 if inrange(global_rank, 251, .)
-replace GLOBAL_CLASS = 8 if missing(global_rank)
+replace GLOBAL_CLASS = 8 if inrange(global_rank, 251, 300)
+replace GLOBAL_CLASS = 9 if inrange(global_rank, 301, 400)
+replace GLOBAL_CLASS = 10 if inrange(global_rank, 401, 500)
+replace GLOBAL_CLASS = 11 if inrange(global_rank, 501, .)
+replace GLOBAL_CLASS = 11 if missing(global_rank)
 
 assert GLOBAL_CLASS != .
+*/
 
 
 * create groups of top institutions based on rankings - regionally

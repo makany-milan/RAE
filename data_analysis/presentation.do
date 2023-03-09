@@ -1,18 +1,36 @@
 * share of women
+clear
 cd "$data_folder"
-use "author_panel"
+use "author_panel.dta"
 
 set scheme white_tableau
 
 capture gen female = 1 if inrange(p_female, 0, 1)
 replace female = 0 if inrange(p_female, -1, 0)
 
-keep if inrange(year, 1990, 2022)
-
 collapse (mean) female if num_pubs > 0, by(year)
 tsset year
-twoway tsline female
+twoway tsline female if inrange(year, 1970, 2022), ytitle(Share of women in economics) xtitle(Year)
 
+* share of women by region
+clear
+cd "$data_folder"
+use "author_panel.dta"
+
+
+* merge countries to regions
+merge m:1 inst_country using "regions/regions"
+
+set scheme white_tableau
+
+capture gen female = 1 if inrange(p_female, 0, 1)
+replace female = 0 if inrange(p_female, -1, 0)
+
+collapse (first) region (mean) female if num_pubs > 0, by(year region_id)
+xtset region_id year
+twoway (tsline female if inrange(year, 1990, 2022) & (region=="UK")) /// 
+		(tsline female if inrange(year, 1990, 2022) & (region=="US")) ///
+		(tsline female if inrange(year, 1990, 2022) & (region=="EU")), ytitle(Share of women in economics) xtitle(Year) legend(label(1 "UK")  label(2 "US") label(3 "EU"))
 
 * number of pubs
 clear

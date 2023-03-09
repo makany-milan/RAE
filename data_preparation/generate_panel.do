@@ -7,15 +7,38 @@ use "works"
 
 capture gen author2= author_id
 
-collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
+gen avg_cite_journal = journal_cited_by_count / journal_works_count
+
+
+
+gen prod = (citations/avg_cite_journal) * aif
+gen log_prod = log(prod)
+
+gen wprod = (citations/avg_cite_journal) * waif
+gen log_wprod = log(prod)
+
+
+/*
+* remove some extreme outliers in the data - potentially corrupt observations
+drop if num_pubs > 100
+
+bys author_id year: egen pubs_per_year = count(paper_id)
+bys author_id: egen maxpubs_per_year = max(pubs_per_year)
+drop if maxpubs_per_year > 10
+*/
+
+
+collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) wprod=wprod log_wprod=log_wprod prod=prod log_prod=log_prod aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
 xtset author_id year
 tsfill
 
-
+* we dont need these variables
+/*
 foreach lvar of varlist aif jif wjif jci wjci jifwsc wjifwsc citations wcitations top5s wtop5s {
 	replace `lvar' = 0 if missing(`lvar')
 	gen `lvar'_ma3 = (l1.`lvar' + `lvar' + f1.`lvar') / 3
 }
+*/
 
 gsort author_id +year
 by author_id: replace reltime = _n

@@ -40,7 +40,6 @@ global data_folder = "D:\GoogleDrive\RAE"
 * laptop
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
-*/
 
 /*
 * Procedure Outline
@@ -144,7 +143,6 @@ use "works"
 cd "$scripts_folder"
 do "data_preparation/infer_affiliation.do"
 
-assert aff_inst_id !=  17866348
 
 cd "$data_folder"
 save "works", replace
@@ -185,6 +183,7 @@ cd "$scripts_folder"
 do "data_preparation/import_rankings.do"
 */
 
+
 * 4f) Merge university rankings
 cd "$scripts_folder"
 do "data_preparation/merge_rankings.do" 
@@ -193,14 +192,14 @@ do "data_preparation/merge_rankings.do"
 cd "$scripts_folder"
 do "data_preparation/construct_regions.do" 
 
-
 */
+
 
 
 * 5) Analysis
 * 5a) Construct sample for analysis
 cd "$scripts_folder"
-do "data_analysis/construct_sample.do"
+do "data_analysis/construct_sample2.do"
 
 
 * 5b) Construct Latent Classes
@@ -208,6 +207,7 @@ do "data_analysis/construct_sample.do"
 * construct: UK US EU NA REST, TOP5 TOP25 TOP50
 cd "$scripts_folder"
 do "data_analysis/construct_latent_classes.do" 
+
 
 * 5c) Confirm connected set of latent types
 * We need movement in both directions between sets
