@@ -1,6 +1,7 @@
 * 5e) Generate summary statistics and descriptive graphs
 
 clear
+cd "$data_folder"
 use "sample"
 
 /*
@@ -11,10 +12,10 @@ eststo women: qui estpost sum ///
 	
 esttab men women, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
 */
-collapse (mean) wprod top5s citations wcitations wtop5s wpubs avg_coauthors year_author_pubs female num_pubs , by(aff_inst_id)
+collapse (mean) prod top5s citations wcitations wtop5s wpubs avg_coauthors year_author_pubs female num_pubs , by(aff_inst_id)
 
 eststo insts: qui estpost sum ///
-	 wprod citations wcitations top5s year_author_pubs wpubs avg_coauthors female
+	 prod citations wcitations top5s year_author_pubs wpubs avg_coauthors female
 	
 esttab insts, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
 
@@ -43,8 +44,8 @@ global percentiles = 4
 *xtile pf = aif if female == 1, n($percentiles)
 *xtile pm = aif if female == 0, n($percentiles)
 
-*xtile pf = fe1_female, n($percentiles)
-*xtile pm = fe1_male, n($percentiles)
+xtile pf = fe1_female, n($percentiles)
+xtile pm = fe1_male, n($percentiles)
 
 bys pf:su fe1_female
 bys pm: su fe1_male
@@ -101,3 +102,12 @@ collapse (mean) share, by(GLOBAL_CLASS female percentile)
 drop if share == .
 reshape wide share, i(GLOBAL_CLASS female) j(percentile)
 graph bar share*, over(GLOBAL_CLASS) by(female) stack percent
+
+
+
+clear
+use "sample_fe"
+gen lprod = log(prod)
+collapse (mean) lprod (sd) se_prod=prod, by(female REGION_CLASS)
+twoway (scatter lprod REGION_CLASS if female == 1, color(red)) (scatter lprod REGION_CLASS if female == 0, color(blue))
+

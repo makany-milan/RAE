@@ -23,7 +23,7 @@ capture ssc install schemepack
 * GLOBAL SETTINGS
 * Classifications as economist: what proportion of publications is required to be
 * in economics to be treated as an economist
-global ec_prop_cutoff = 0.3333
+global ec_prop_cutoff = 0.5
 
 
 * warwick pc
@@ -41,7 +41,7 @@ global data_folder = "D:\GoogleDrive\RAE"
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 
-/*
+*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 

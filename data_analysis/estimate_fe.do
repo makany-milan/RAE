@@ -161,7 +161,7 @@ capture drop y
 capture drop temp 
 capture drop fe1 fe2
 
-gen y = wprod  if female == 1
+gen y = prod  if female == 1 & inrange(REGION_CLASS, )
 
 generate double temp=0 if female == 1
 generate double fe1=0 if female == 1
@@ -186,7 +186,7 @@ while abs(`dif')>epsdouble() {
 		egen double fe1=mean(temp), by(author_id)
 		replace temp=res+_b[fe2]*fe2, nopromote
 		capture drop fe2
-		egen double fe2=mean(temp), by(aff_inst_id)
+		egen double fe2=mean(temp), by(REGION_CLASS)
 		local i=`i'+1
 		
 		if mod(`i', 50) == 0{
@@ -212,7 +212,7 @@ capture drop y
 capture drop temp 
 capture drop fe1 fe2
 
-gen y = wprod if female == 0
+gen y = prod if female == 0
 
 generate double temp=0 if female == 0
 generate double fe1=0 if female == 0
@@ -237,7 +237,7 @@ while abs(`dif')>epsdouble() {
 		egen double fe1=mean(temp), by(author_id)
 		replace temp=res+_b[fe2]*fe2, nopromote
 		capture drop fe2
-		egen double fe2=mean(temp), by(aff_inst_id)
+		egen double fe2=mean(temp), by(REGION_CLASS)
 		local i=`i'+1
 		
 		if mod(`i', 50) == 0{
