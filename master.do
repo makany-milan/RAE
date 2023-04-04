@@ -41,7 +41,7 @@ global data_folder = "D:\GoogleDrive\RAE"
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 
-*
+/*
 * Procedure Outline
 * 1) Collect data from OpenAlex
 
@@ -160,16 +160,14 @@ cd "$scripts_folder"
 do "data_preparation/import_merge_jcr.do" 
 
 
-
 * Generate top5 and co-author weighed variables
 cd "$scripts_folder"
 do "data_preparation/gen_weighed_vars.do" 
-
+ 
 
 * 4c) Generate pub quality author-year panel
 cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
-
 
 
 * 4d) Assign gender
@@ -197,6 +195,10 @@ do "data_preparation/construct_regions.do"
 
 
 * 5) Analysis
+
+* Sample construction has to be moved after latent classes.
+* First we mus define experience_k_it foreach individual i
+
 * 5a) Construct sample for analysis
 cd "$scripts_folder"
 do "data_analysis/construct_sample2.do"
@@ -211,6 +213,8 @@ do "data_analysis/construct_latent_classes.do"
 
 * 5c) Confirm connected set of latent types
 * We need movement in both directions between sets
+* This step is more of a formality, since the number of classes is quite small in the sample
+* Potentially has more significance if the number of classes is increased
 cd "$scripts_folder"
 do "data_analysis/confirm_connected.do"
 
