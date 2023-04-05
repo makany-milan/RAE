@@ -1,4 +1,5 @@
-* Code used to merge OpenAlex journal data with EconLit and WebOfScience data
+* Import and merge journal data from OpenAlex, WOS, and Econlit
+
 cd "$data_folder\journals"
 * create directory to save datasets
 capture mkdir "formatted"
