@@ -1,7 +1,4 @@
-* Assign gender to authors
-
-*** COPY CODE FROM WOMEN IN ACADEMIA PROJECT TO MERGE SSA GENDER
-* First name is forename, if abbrev drop
+* Assign gender to Economists
 
 capture program drop normalise_name
 program normalise_name
@@ -22,6 +19,7 @@ program normalise_name
 	replace `varname' = stritrim(`varname')
 	end
 
+* Construct name frequency file
 
 clear
 cd "$data_folder"
@@ -36,17 +34,20 @@ if !`data_compiled' {
 	do "data_preparation/assign_gender"
 }
 
+* Import all potential economists from OpenAlex
 
 clear
 cd "$data_folder"
 import delimited using "openalex_data/openalex-econ_authors.csv", encoding(utf-8) delimiter(";") bindquotes(strict)
 keep author_id author_name
 
-* remove special characters, etc.
-split author_name, gen(name_part_)
+* Drop corrupt observations
 * drop empty observations
 drop if author_name == "N/A"
 drop if missing(author_name)
+* remove special characters, etc.
+split author_name, gen(name_part_)
+
 
 gen name_last_part = .
 * normalise name
@@ -102,11 +103,5 @@ drop high_prob
 save "openalex_data/authors_gender", replace
 
 
-* merge gender to panel
-clear
-use "author_panel"
-merge m:1 author_id using "openalex_data/authors_gender" // 67.41%
-drop if _merge == 2
-drop _merge
-
-save "author_panel", replace
+* Get neural network prediction for gender
+* Create list of names not matched to SSA

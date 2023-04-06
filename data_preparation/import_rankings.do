@@ -1,4 +1,4 @@
-* 4e) Import university rankings
+* Import university rankings
 
 clear
 cd "$data_folder"

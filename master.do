@@ -59,23 +59,33 @@ global data_folder = "G:\My Drive\RAE"
 *	Import raw data files and save in Stata format for data processing and analysis.
 *
 *	2a) Import raw works file containing all publication data from potential economics authors
-*	2b) Import institution data
-* 	2c) Import rankings data
-*	2d) Import publication quality data
-*	2e) Import gender data, train neural network for classification
+*	2b) Import affiliations
+*	2c) Import institution data
+* 	2d) Import rankings data
+*	2e) Import publication quality data
+*	2f) Import gender data, train neural network for classification
+*	2g) Import ID errors
+*	2h) Import regions
 
 * 3) Data processing
+*	Merge data files, remove corrupt observations to prepare for the construction
+*	of the author and department panels
+*
 *	3a) Merge works to affiliations and journals
-* 	3b) Fix ID errors
-*	3c) Merge publication quality data
-*	3d) Filter economists
-*	3x) Manually correct some classification errors
+*	3b) Fix ID errors
+* 	3c) Merge publication quality data
+* 	3d) Filter economists
+* 	3f) Create measures of quality & quantity for productivity
+* 	3g) Merge rankings
+* 	3h) Merge gender
+* 	3i) Remove corrupt observations
 
-* 3) Construct a panel of authors and departments
-* 	3a) Infer affiliation for missing observations
+
+* 4) Construct a panel of authors and departments
+* 	4a) Infer affiliation for missing observations
 
 
-* 4) Analysis
+* 5) Analysis
 * 	5a) Construct sample for analysis
 *	5b) Construct Latent Classes
 *	5c) Confirm connected set of latent types
@@ -87,7 +97,7 @@ global data_folder = "G:\My Drive\RAE"
 
 * 1) Data Collection
 * ==============================================================================
-/*
+*
 * 1a) Constuct list of economics journals
 	* Import and merge journal data from OpenAlex, WOS, and Econlit
 
@@ -127,7 +137,7 @@ global data_folder = "G:\My Drive\RAE"
 
 * 2) Data preparation
 * ==============================================================================
-/*
+*
 * 2a) Import raw works file containing all publication data from potential economics authors
 	cd "$scripts_folder"
 	do "data_preparation/import_works.do"
@@ -141,7 +151,8 @@ global data_folder = "G:\My Drive\RAE"
 	do "data_preparation/import_institutions.do"
 
 * 2d) Import rankings data
-
+	* This section has been moved off post 3a) 3b)
+	* works.dta must contain affiliation data
 
 
 * 2e) Import publication quality data
@@ -149,11 +160,16 @@ global data_folder = "G:\My Drive\RAE"
 	do "data_preparation/import_journal_quality.do" 
 
 * 2f) Import gender data, train neural network for classification
-
+	cd "$scripts_folder"
+	do "data_preparation/assign_gender.do"
 
 * 2g) Import ID errors
 	cd "$scripts_folder"
-	do "data_preparation/import_journal_quality.do" 
+	do "data_preparation/import_id_errors.do"
+	
+* 2h) Import regions
+	cd "$scripts_folder"
+	do "data_preparation/construct_regions.do" 
 
 
 * At this stage we have loaded all raw data files into Stata format.
@@ -166,7 +182,7 @@ global data_folder = "G:\My Drive\RAE"
 
 * 3) Data processing
 * ==============================================================================
-/*
+*
 	clear
 	cd "$data_folder"
 	use works
@@ -185,35 +201,67 @@ global data_folder = "G:\My Drive\RAE"
 	do "data_processing/fix_id_errors.do"
 
 * 3c) Merge publication quality data
-	cd "$scripts_folder"
-	do "data_processing/merge_journal_quality.do" 
-	
-*/
+	* This step has been moved after 3d) to increase performance
 	
 * 3d) Filter economists
 	cd "$scripts_folder"
-	do "data_processing/filter_econ_authors.do"
+	do "data_processing/filter_economists.do"
 	
-* 3e) Assign gender
+* 3c) Merge publication quality data
 	cd "$scripts_folder"
-	do "data_processing/assign_gender.do"
+	do "data_processing/merge_journal_quality.do" 
 
-* 3f) Create measures of quality & quantity
+* 3f) Create measures of quality & quantity for productivity
 	cd "$scripts_folder"
-	do "data_preparation/gen_weighed_vars.do" 
-
-
-
-* 3g) Merge rankings
-
-
+	do "data_processing/generate_productivity_measures.do" 
 	
 * Save works file with all modifications
-	err
 	cd "$data_folder"
 	save works, replace
+	
+* 2d) Import rankings data
+	cd "$scripts_folder"
+	do "data_preparation/import_rankings.do"
+	
+	clear
+	cd "$data_folder"
+	use works
+
+* 3g) Merge rankings
+	cd "$scripts_folder"
+	do "data_processing/merge_rankings.do" 
+
+* 3h) Merge gender
+	cd "$scripts_folder"
+	do "data_processing/merge_gender.do"
+
+* 3i) Remove corrupt observations
+	cd "$scripts_folder"
+	do "data_processing/remove_corrupt_data.do"
+
+* Save works file with all modifications
+	cd "$data_folder"
+	save works, replace
+*/
+* ==============================================================================
+
+err
+* 4) Construct a panel of authors and departments
+* ==============================================================================
+
+
 
 * ==============================================================================
+
+
+* 5) Analysis
+* ==============================================================================
+
+
+
+* ==============================================================================
+
+
 
 	* 5a) Construct Latent Classes
 	* Create single metric based on QS, THE, CWUR
@@ -221,38 +269,11 @@ global data_folder = "G:\My Drive\RAE"
 	cd "$scripts_folder"
 	do "data_analysis/construct_latent_classes.do" 
 
-
-
-err
-
-
-
-
-
- 
-
+	
+	
 * 4c) Generate pub quality author-year panel
 cd "$scripts_folder"
 do "data_preparation/generate_panel.do" 
-
-
-
-
-* 4f) Merge university rankings
-cd "$scripts_folder"
-do "data_preparation/merge_rankings.do" 
-
-* 4g) Construct regions for institution classes
-cd "$scripts_folder"
-do "data_preparation/construct_regions.do" 
-
-
-* 4) Construct a panel of publications and affiliations
-cd "$scripts_folder"
-do "data_preparation/import_works_and_affiliations.do"
-* merge to journals and affiliations
-cd "$scripts_folder"
-do "data_preparation/merge_works_affiliations_journals.do"
 
 
 * drop useless variables
