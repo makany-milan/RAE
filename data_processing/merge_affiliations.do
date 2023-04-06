@@ -1,11 +1,10 @@
-* Merge publications with journals and affiliations
-
-clear
-cd "$data_folder"
-use "works.dta"
+* Merge affiliations
 
 format paper_id %12.0g
 format author_id %12.0g
+
+
+cd "$data_folder"
 
 * merge to affiliations based on publication and author
 merge 1:1 paper_id author_id using "affiliations/affiliations.dta", update // 18.21% has affiliation
@@ -40,7 +39,7 @@ gsort author_id -mover
 by author_id: replace mover = mover[1] if missing(mover)
 by author_id: replace moves = moves[1] if missing(moves)
 
-* drop authors without affiliations
+* drop authors without any affiliations
 drop if mover == . //  8.65%
 
 * confirm that there are no authors left without affiliation
@@ -48,22 +47,3 @@ drop if mover == . //  8.65%
 bys author_id: egen n_inst = nvals(aff_inst_id), missing
 assert n_inst != .
 drop n_inst
-
-format journal_id %12.0g
-
-* merge publications to journals
-merge m:1 journal_id using "journals/econ_journals.dta", update
-drop if _merge == 2
-drop _merge
-
-* merge all journals
-merge m:1 journal_id using "journals/formatted/all_journals.dta", update
-drop if _merge == 2
-drop _merge
-
-
-* find proportion of publications in economics journals
-replace econ_journal = 0 if econ_journal == . // overall 17.19%
-
-
-save "works", replace

@@ -1,5 +1,7 @@
 * 4b) Disambiguate IDs
 
+cd "$data_folder"
+
 * iterate replacements until no more changes are made
 local changes = 1
 while `changes' != 0 {

@@ -1,5 +1,4 @@
-* 4) Import impact factor and other meaasures of journal quality
-
+* Import impact factor and other measures of journal quality
 clear
 cd "$data_folder"
 
@@ -65,25 +64,3 @@ drop dupe _dupe
 replace issn = eissn
 
 save "jcr/formatted/jcr-ec-eissn", replace
-
-
-clear
-use "works"
-
-merge m:1 issn using "jcr/formatted/jcr-ec-issn"
-drop if _merge == 2
-drop _merge
-
-merge m:1 eissn using "jcr/formatted/jcr-ec-issn"
-drop if _merge == 2
-drop _merge
-
-merge m:1 eissn using "jcr/formatted/jcr-ec-eissn", update
-drop if _merge == 2
-drop _merge
-
-merge m:1 issn using "jcr/formatted/jcr-ec-eissn", update
-drop if _merge == 2
-drop _merge
-
-save "works", replace

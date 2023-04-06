@@ -1,4 +1,4 @@
-* 3a) Filter economics authors against an arbitrary threshold
+* Filter economics authors using arbitrary threshold
 
 * if ec_prop is undefined use value here
 if missing("$ec_prop_cutoff") {
@@ -13,6 +13,3 @@ bys author_id: egen ec_prop = mean(econ_journal)
 
 * keep observations of authors who publish in economics
 keep if ec_prop > $ec_prop_cutoff
-
-cd "$data_folder"
-save "works", replace

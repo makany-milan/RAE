@@ -1,4 +1,4 @@
-* 4a) Assign gender
+* Assign gender to authors
 
 *** COPY CODE FROM WOMEN IN ACADEMIA PROJECT TO MERGE SSA GENDER
 * First name is forename, if abbrev drop
