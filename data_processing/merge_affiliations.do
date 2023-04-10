@@ -30,7 +30,20 @@ drop issue
 replace aff_inst_id = aff_inst_id_inferred if aff_inst_id == .
 drop aff_inst_id_inferred
 
-* infer the value of institution based on years before and after
+* get rid of non-university institutions
+merge m:1 aff_inst_id using "openalex_data/institutions", update keepusing(inst_type inst_name)
+replace aff_inst_id = . if inst_type != "education"
+* merge FED branches if there are any left
+replace aff_inst_id = 1317239608 if strpos(lower(inst_name), "federal reserve")
+drop inst_type _merge
+
+* get rid of NBER, CEPR, IFO, Catalyst, IFS, IMF
+replace aff_inst_id = . if inlist(aff_inst_id, 1321305853, 4210140326, 1279858714, 1340728805, 1309678057, 4210088027, 4210132957, 47987569, 889315371, 4210099736, 4210129476, 139607695, 1310145890, 197518295, 4210166604)
+* some manual corrections
+replace aff_inst_id = 111979921 if aff_inst_id == 4210100400
+replace aff_inst_id = 1334329717 if aff_inst_id == 55633929
+replace aff_inst_id = 7947594 if aff_inst_id == 2802397601
+
 
 * replace moves and mover variables for missing obs
 * infer from values of other publications

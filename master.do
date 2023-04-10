@@ -82,7 +82,9 @@ global data_folder = "G:\My Drive\RAE"
 
 
 * 4) Construct a panel of authors and departments
-* 	4a) Infer affiliation for missing observations
+*	4a) Construct panel for authors
+*	4b) Construct panel for institutions
+*	4c) Construct panel for classes
 
 
 * 5) Analysis
@@ -220,6 +222,7 @@ global data_folder = "G:\My Drive\RAE"
 	save works, replace
 	
 * 2d) Import rankings data
+	* This step requires a list of institutions from works, hence the save and re-loading of the data
 	cd "$scripts_folder"
 	do "data_preparation/import_rankings.do"
 	
@@ -238,20 +241,50 @@ global data_folder = "G:\My Drive\RAE"
 * 3i) Remove corrupt observations
 	cd "$scripts_folder"
 	do "data_processing/remove_corrupt_data.do"
-
-* Save works file with all modifications
+	
+	
+	* Save works file with all modifications
 	cd "$data_folder"
 	save works, replace
+	* next step will collapse data
+	
+* 3j) Merge classes
+	cd "$scripts_folder"
+	do "data_processing/construct_classes.do"
+	
+
+
 */
 * ==============================================================================
 
-err
+
 * 4) Construct a panel of authors and departments
 * ==============================================================================
 
+* 4a) Construct panel for authors
+	clear
+	cd "$data_folder"
+	use works
 
+	cd "$scripts_folder"
+	do "construct_panel/generate_author_panel.do" 
+
+		
+* 4b) Construct panel for institutions
+	clear
+	cd "$data_folder"
+	use works
+	
+	cd "$scripts_folder"
+	do "construct_panel/generate_inst_panel.do" 
+
+
+* 4c) Construct panel for classes	
 
 * ==============================================================================
+
+
+err
 
 
 * 5) Analysis
@@ -261,19 +294,7 @@ err
 
 * ==============================================================================
 
-
-
-	* 5a) Construct Latent Classes
-	* Create single metric based on QS, THE, CWUR
-	* construct: UK US EU NA REST, TOP5 TOP25 TOP50
-	cd "$scripts_folder"
-	do "data_analysis/construct_latent_classes.do" 
-
 	
-	
-* 4c) Generate pub quality author-year panel
-cd "$scripts_folder"
-do "data_preparation/generate_panel.do" 
 
 
 * drop useless variables
@@ -290,10 +311,7 @@ use "works"
 * Remove corrupt observations where journal is missing
 drop if missing(journal_name)
 
-* FOUND A BUG!!!!
-* STATA GENERATES WRONG VALUES FOR INST_ID UNLESS DOUBLE IS SPECIFIES AS DATATYPE
-cd "$scripts_folder"
-do "data_preparation/infer_affiliation.do"
+
 
 
 cd "$data_folder"

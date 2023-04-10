@@ -13,3 +13,18 @@ gen wpubs = 1/number_of_authors
 
 * Generate moving average of variables
 
+* Old productivity variables
+/*
+gen avg_cite_journal = journal_cited_by_count / journal_works_count
+
+gen prod = (citations/avg_cite_journal) * aif
+gen log_prod = log(prod)
+
+gen wprod = (citations/avg_cite_journal) * waif
+gen log_wprod = log(prod)
+*/
+
+
+* Quality
+* Average quality of publications in a given year
+*gen avg_aif = aif/year_author_pubs

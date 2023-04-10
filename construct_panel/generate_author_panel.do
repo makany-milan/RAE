@@ -1,22 +1,7 @@
-* 4c) Generate author-year & inst-year panels
+* Generate author panel - expand years between first and last observation
 
-* author panel
-clear
-cd "$data_folder"
-use "works"
-
+* Store original variable
 capture gen author2= author_id
-
-gen avg_cite_journal = journal_cited_by_count / journal_works_count
-
-
-
-gen prod = (citations/avg_cite_journal) * aif
-gen log_prod = log(prod)
-
-gen wprod = (citations/avg_cite_journal) * waif
-gen log_wprod = log(prod)
-
 
 /*
 * remove some extreme outliers in the data - potentially corrupt observations
@@ -27,8 +12,9 @@ bys author_id: egen maxpubs_per_year = max(pubs_per_year)
 drop if maxpubs_per_year > 10
 */
 
+* Here we are taking the first aff_inst_id - this might casue some issues 
 
-collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) wprod=wprod log_wprod=log_wprod prod=prod log_prod=log_prod aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
+collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) total_aif=aif total_top5=top5 (mean) avg_aif=aif (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
 xtset author_id year
 tsfill
 
@@ -46,21 +32,7 @@ by author_id: replace reltime = _n
 format aff_inst_id %12.0g
 format author_id %12.0g
 
-* merge uni name
-cd "$data_folder"
-merge m:1 aff_inst_id using "openalex_data/institutions.dta", keepusing(inst_name)
-drop if _merge == 2
-drop _merge
-
 bys author_id: egen insts = nvals(aff_inst_id)
-* get rid of NBER, CEPR, IFO, Catalyst, IFS, IMF
-replace aff_inst_id = . if inlist(aff_inst_id, 1321305853, 4210140326, 1279858714, 1340728805, 1309678057, 4210088027, 4210132957, 47987569, 889315371, 4210099736, 4210129476, 139607695, 1310145890, 197518295, 4210166604) & insts > 1
-* merge FED branches
-replace aff_inst_id = 1317239608 if strpos(lower(inst_name), "federal reserve")
-* some manual corrections
-replace aff_inst_id = 111979921 if aff_inst_id == 4210100400
-replace aff_inst_id = 1334329717 if aff_inst_id == 55633929
-replace aff_inst_id = 7947594 if aff_inst_id == 2802397601
 
 * replace small institutions that could be errors
 bys aff_inst_id: replace aff_inst_id = . if _N < 5
@@ -74,7 +46,7 @@ drop insts ninsts
 
 * Infer affiliation for missing observations
 cd "$scripts_folder"
-do "data_preparation/infer_affiliation.do" 
+do "construct_panel/infer_affiliation.do" 
 
 
 * filter out anomalies in affiliation
@@ -98,7 +70,7 @@ capture drop below_id
 capture drop above_id
 * Infer affiliation for missing observations
 cd "$scripts_folder"
-do "data_preparation/infer_affiliation.do" 
+do "construct_panel/infer_affiliation.do" 
 
 drop repprob anomaly move
 
@@ -122,12 +94,12 @@ capture drop above_id
 tsfill
 * Infer affiliation for missing observations
 cd "$scripts_folder"
-do "data_preparation/infer_affiliation.do" 
+do "construct_panel/infer_affiliation.do" 
 
 
 * look at people who might move back and forth frequently
 * these people have moved somewhere and back at least once
-count if number_of_moves> insts
+count if number_of_moves > insts
 
 * merge uni name
 cd "$data_folder"
@@ -138,22 +110,4 @@ drop _merge
 
 cd "$data_folder"
 save "author_panel", replace
-
-
-* institution panel
-clear
-cd "$data_folder"
-use "works"
-
-bys year aff_inst_id: egen nauthors = nvals(author_id)
-
-collapse (first) authors=nauthors (sum) aif=aif waif=waif jif=jif wjif=wjif jci=jci wjci=wjci jifwsc=jifwithoutselfcites wjifwsc=wjifwsc citations=citations wcitations=wcitations top5s=top5 wtop5s=wtop5 wpubs=wpubs (count) pubs = author_id, by(aff_inst_id year)
-
-xtset aff_inst_id year
-tsfill
-
-gsort aff_inst_id +year
-
-cd "$data_folder"
-save "inst_panel", replace
 
