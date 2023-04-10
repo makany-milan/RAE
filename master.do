@@ -7,7 +7,7 @@
 
 clear
 clear programs
-set varabbrev off
+set varabbrev off, permanently
 
 
 /*
@@ -22,7 +22,7 @@ capture ssc install schemepack
 * GLOBAL SETTINGS
 * Classifications as economist: what proportion of publications is required to be
 * in economics to be treated as an economist
-global ec_prop_cutoff = 0.33
+global ec_prop_cutoff = 0.5
 
 
 * warwick pc
@@ -251,8 +251,6 @@ global data_folder = "G:\My Drive\RAE"
 * 3j) Merge classes
 	cd "$scripts_folder"
 	do "data_processing/construct_classes.do"
-	
-
 
 */
 * ==============================================================================

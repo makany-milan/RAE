@@ -82,23 +82,30 @@ gen REGION_CLASS = .
 local loop_var = 0
 * loop through regions and generate variables
 foreach regi in "US" "UK" "EU" "NA" "REST" {
-    count if !missing(global_rank)
+    di "`regi'"
+    count if !missing(region_rank) & region == "`regi'"
 	local total_nonmis = `r(N)'
-
-	sort global_rank
-	replace GLOBAL_CLASS = int(10*(global_rank-1)/`total_nonmis')+1 if !missing(region_rank) & region == "`regi'"
+	
+	local la1 = 1+(`loop_var'*4)
+	local la2 = 2+(`loop_var'*4)
+	local la3 = 3+(`loop_var'*4)
+	local la4 = 4+(`loop_var'*4)
 	
 	* add label
-	la de region_classes 1+(`loop_var'*5) "`regi'-P20" 2+(`loop_var'*5) "`regi'-P40" 3+(`loop_var'*5) "`regi'-P60" 4+(`loop_var'*5) "`regi'-P80" 5+(`loop_var'*5) "`regi'-P100", add
+	la de region_classes `la1' "`regi'-P25" `la2' "`regi'-P50" `la3' "`regi'-P75" `la4' "`regi'-P100", add
+	
+	* change value
+	qui: su region_rank if !missing(region_rank) & region == "`regi'", det
+	sort region_rank
+	replace REGION_CLASS = `la4' if region_rank <= `r(max)' & !missing(region_rank) & region == "`regi'"
+	replace REGION_CLASS = `la3' if region_rank < `r(p75)' & !missing(region_rank) & region == "`regi'"
+	replace REGION_CLASS = `la2' if region_rank < `r(p50)' & !missing(region_rank) & region == "`regi'"
+	replace REGION_CLASS = `la1' if region_rank < `r(p25)' & !missing(region_rank) & region == "`regi'"
 	
 	local loop_var = `loop_var'+1
 }
 
 la val REGION_CLASS region_classes
 
-assert REGION_CLASS != .
 
 save "classes/global-regional-classes", replace
-
-
-

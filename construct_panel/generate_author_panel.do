@@ -37,7 +37,7 @@ bys author_id: egen insts = nvals(aff_inst_id)
 * replace small institutions that could be errors
 bys aff_inst_id: replace aff_inst_id = . if _N < 5
 
-drop insts inst_name
+drop insts
 bys author_id: egen insts = nvals(aff_inst_id)
 bys author_id: egen ninsts = max(insts)
 * get rid of people with only NBER, CEPR, IFO, Catalyst affiliation
@@ -106,6 +106,42 @@ cd "$data_folder"
 merge m:1 aff_inst_id using "openalex_data/institutions.dta", keepusing(inst_name)
 drop if _merge == 2
 drop _merge
+
+* merge region class
+cd "$data_folder"
+merge m:1 aff_inst_id using "classes/global-regional-classes", keepusing(GLOBAL_CLASS REGION_CLASS)
+* nothing should get dropped here realistically
+drop if _merge == 2
+drop _merge
+
+* generate variable for heterogeneous experience
+gsort author_id +year
+* create temp vars
+by author_id: gen tmp_exp1 = 1 if GLOBAL_CLASS == 1
+by author_id: gen tmp_exp2 = 1 if GLOBAL_CLASS == 2
+by author_id: gen tmp_exp3 = 1 if GLOBAL_CLASS == 3
+by author_id: gen tmp_exp4 = 1 if GLOBAL_CLASS == 4
+by author_id: gen tmp_exp5 = 1 if GLOBAL_CLASS == 5
+by author_id: gen tmp_exp6 = 1 if GLOBAL_CLASS == 6
+by author_id: gen tmp_exp7 = 1 if GLOBAL_CLASS == 7
+by author_id: gen tmp_exp8 = 1 if GLOBAL_CLASS == 8
+by author_id: gen tmp_exp9 = 1 if GLOBAL_CLASS == 9
+by author_id: gen tmp_exp10 = 1 if GLOBAL_CLASS == 10
+
+gsort author_id +year
+* generate cumulative experience variable
+by author_id: gen total_exp_global_1 = sum(tmp_exp1)
+by author_id: gen total_exp_global_2 = sum(tmp_exp2)
+by author_id: gen total_exp_global_3 = sum(tmp_exp3)
+by author_id: gen total_exp_global_4 = sum(tmp_exp4)
+by author_id: gen total_exp_global_5 = sum(tmp_exp5)
+by author_id: gen total_exp_global_6 = sum(tmp_exp6)
+by author_id: gen total_exp_global_7 = sum(tmp_exp7)
+by author_id: gen total_exp_global_8 = sum(tmp_exp8)
+by author_id: gen total_exp_global_9 = sum(tmp_exp9)
+by author_id: gen total_exp_global_10 = sum(tmp_exp10)
+
+drop tmp_exp*
 
 
 cd "$data_folder"
