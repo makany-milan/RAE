@@ -277,12 +277,25 @@ global data_folder = "G:\My Drive\RAE"
 	do "construct_panel/generate_inst_panel.do" 
 
 
-* 4c) Construct panel for classes	
+* 4c) Construct panel for classes - GLOBAL
+
+	clear
+	cd "$data_folder"
+	use works
+	
+	cd "$scripts_folder"
+	do "construct_panel/generate_class_panel_global.do" 
+	
+* 4d) Construct panel for classes - REGIONAL
+
+	clear
+	cd "$data_folder"
+	use works
+	
+	cd "$scripts_folder"
+	do "construct_panel/generate_class_panel_regional.do" 
 
 * ==============================================================================
-
-
-err
 
 
 * 5) Analysis
@@ -291,33 +304,6 @@ err
 
 
 * ==============================================================================
-
-	
-
-
-* drop useless variables
-drop see formerly publisheraddress webofsciencecategories 
-
-
-* debug : no issues so far
-
-* 4b) Infer affiliation for missing observations
-cd "$data_folder"
-clear
-use "works"
-
-* Remove corrupt observations where journal is missing
-drop if missing(journal_name)
-
-
-
-
-cd "$data_folder"
-save "works", replace
-
-
-* WHAT TO DO WITH THOSE OBSERVATIONS WHERE THERE IS A SEEMINGLY RANDOM MOVE IN THE MIDDLE
-* OF A CONSISTENT INSTITUTION
 
 */
 
