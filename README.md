@@ -29,6 +29,7 @@ The codes in the repository are used by the author to extract, process, and anal
 
 ## Repository Structure
 
+**Make sure to change all file and folder paths when running the code**
 
 0) Research Proposal / Outline - ***/proposal/***
 
@@ -36,8 +37,6 @@ The codes in the repository are used by the author to extract, process, and anal
 
     - Deadline: 28/11/2022
     - Propose a research question, identify key data source, and discuss identification
-
-**Make sure to change all file and folder paths when running the code**
 
 1) Data Extraction - ***Python*** - ***/data_collection/***
 
