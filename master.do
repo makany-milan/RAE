@@ -89,10 +89,9 @@ global data_folder = "G:\My Drive\RAE"
 
 * 5) Analysis
 * 	5a) Construct sample for analysis
-*	5b) Construct Latent Classes
-*	5c) Confirm connected set of latent types
-*	5d) Run TWFE estimation
-*	5e) Generate summary statistics and descriptive graphs
+*	5b) Confirm connected set of classes
+*	5c) Run TWFE estimation
+*	5d) Generate summary statistics and descriptive graphs
 
 
 
@@ -302,6 +301,27 @@ global data_folder = "G:\My Drive\RAE"
 * ==============================================================================
 
 
+* 5a) Construct sample for analysis
+*	Apply additional sample restrictions.
+*	i) Time restrictions
+*	ii) Keep authors who are only in ranked institutions
+*	iii) Minimum publication requirement
+	cd "$scripts_folder"
+	do "data_analysis/construct_sample.do"
+
+
+* 5b) Confirm connected set of classes
+	cd "$scripts_folder"
+	do "data_analysis/confirm_connected.do"
+
+* 5c) Run TWFE estimation
+	cd "$scripts_folder"
+	do "data_analysis/estimate_fe.do" 
+	
+* 5d) Generate summary statistics and descriptive graphs
+	cd "$scripts_folder"
+	do "data_analysis/summary_stats.do" 
+
 
 * ==============================================================================
 
@@ -309,35 +329,23 @@ global data_folder = "G:\My Drive\RAE"
 
 
 
-* 5) Analysis
-
 * 5b) Confirm connected set of latent types
 * We need movement in both directions between sets
 * This step is more of a formality, since the number of classes is quite small in the sample
 * Potentially has more significance if the number of classes is increased
-cd "$scripts_folder"
-do "data_analysis/confirm_connected.do"
+
 
 
 * Sample construction has to be moved after latent classes.
 * First we mus define experience_k_it foreach individual i
 
 
-* 5c) Construct sample for analysis
-cd "$scripts_folder"
-do "data_analysis/construct_sample2.do"
-
-
-
-
 
 * 5d) Run TWFE estimation
-cd "$scripts_folder"
-do "data_analysis/estimate_fe.do" 
+
 
 * 5e) Generate summary statistics and descriptive graphs
-cd "$scripts_folder"
-do "data_analysis/summary_stats2.do" 
+
 
 
 
