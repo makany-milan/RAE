@@ -14,7 +14,7 @@ drop if maxpubs_per_year > 10
 
 * Here we are taking the first aff_inst_id - this might casue some issues 
 
-collapse (first) aff_inst_id=aff_inst_id reltime=reltime (sum) total_aif=aif total_top5=top5 (mean) avg_aif=aif (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
+collapse (first) aff_inst_id=aff_inst_id reltime=reltime female=female (sum) total_aif=aif total_top5=top5 (mean) avg_aif=aif (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
 xtset author_id year
 tsfill
 

@@ -5,13 +5,13 @@
 * Cornelissen, T., 2008. The Stata Command Felsdvreg to Fit a Linear Model with Two High-Dimensional Fixed Effects. The Stata Journal 8, 170–189. https://doi.org/10.1177/1536867X0800800202
 
 
-clear
-cd "$data_folder"
-use "sample"
+		clear
+		cd "$data_folder"
+		use "sample"
 
-* merge institution latent types
-merge m:1 aff_inst_id using "classes/global-regional-classes", keepusing(GLOBAL_CLASS REGION_CLASS region)
-keep if _merge == 3
+		* merge institution latent types
+		merge m:1 aff_inst_id using "classes/global-regional-classes", keepusing(GLOBAL_CLASS REGION_CLASS region)
+		keep if _merge == 3
 
 
 /*

@@ -16,13 +16,14 @@ capture ssc install egenmore
 capture ssc install TWFE
 capture ssc install felsdvreg
 capture ssc install schemepack
+capture ssc install plotmatrix
 */
 
 
 * GLOBAL SETTINGS
 * Classifications as economist: what proportion of publications is required to be
 * in economics to be treated as an economist
-global ec_prop_cutoff = 0.5
+global ec_prop_cutoff = 0.333333
 
 
 * warwick pc
@@ -90,11 +91,11 @@ global data_folder = "G:\My Drive\RAE"
 * 5) Analysis
 * 	5a) Construct sample for analysis
 *	5b) Confirm connected set of classes
-*	5c) Run TWFE estimation
+*	5c) Estimate the models
 *	5d) Generate summary statistics and descriptive graphs
 
 
-
+/*
 
 * 1) Data Collection
 * ==============================================================================
@@ -130,7 +131,7 @@ global data_folder = "G:\My Drive\RAE"
 
 	* Extract affiliations for authors that have published in economics journals
 	* see filter.py - filter_econ_affiliations()
-*/
+
 * At this stage we have constructed the raw data files.
 * ==============================================================================
 
@@ -177,7 +178,7 @@ global data_folder = "G:\My Drive\RAE"
 * 	works.dta - contains all publications from potential economists
 *	affiliations/affiliations_fix_year.dta - contains all affiliations where we are certain
 *											that the author was at a given institution in a given year
-*/
+
 * ==============================================================================
 
 
@@ -251,7 +252,7 @@ global data_folder = "G:\My Drive\RAE"
 	cd "$scripts_folder"
 	do "data_processing/construct_classes.do"
 
-*/
+
 * ==============================================================================
 
 
@@ -297,6 +298,10 @@ global data_folder = "G:\My Drive\RAE"
 * ==============================================================================
 
 
+
+*/
+
+
 * 5) Analysis
 * ==============================================================================
 
@@ -314,9 +319,9 @@ global data_folder = "G:\My Drive\RAE"
 	cd "$scripts_folder"
 	do "data_analysis/confirm_connected.do"
 
-* 5c) Run TWFE estimation
+* 5c) Estimate the models
 	cd "$scripts_folder"
-	do "data_analysis/estimate_fe.do" 
+	do "data_analysis/estimate_models.do" 
 	
 * 5d) Generate summary statistics and descriptive graphs
 	cd "$scripts_folder"
@@ -324,35 +329,3 @@ global data_folder = "G:\My Drive\RAE"
 
 
 * ==============================================================================
-
-*/
-
-
-
-* 5b) Confirm connected set of latent types
-* We need movement in both directions between sets
-* This step is more of a formality, since the number of classes is quite small in the sample
-* Potentially has more significance if the number of classes is increased
-
-
-
-* Sample construction has to be moved after latent classes.
-* First we mus define experience_k_it foreach individual i
-
-
-
-* 5d) Run TWFE estimation
-
-
-* 5e) Generate summary statistics and descriptive graphs
-
-
-
-
-/*
-* format variables
-format author_id %12.0g
-format paper_id %12.0g
-format journal_id %12.0g
-format aff_inst_id %12.0g
-*/
