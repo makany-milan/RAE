@@ -49,7 +49,7 @@ format aff_inst_id %12.0g
 	bys author_id (missing_rank): replace missing_rank = missing_rank[1]
 	drop if missing_rank == 1
 	drop missing_rank
-	/*
+	
 	* keep author if they have at least 3 published works in the timeframe
 	* this filters out inactive authors
 	bys author_id: egen au_total_pubs_post00 = sum(year_author_pubs)
@@ -63,7 +63,7 @@ format aff_inst_id %12.0g
 	bys author_id: egen min_age = min(reltime)
 	gen timeframe = max_age - min_age
 	drop if timeframe < 5
-	*/
+	
 	
 	
 

@@ -1,8 +1,8 @@
 * 5e) Generate summary statistics and descriptive graphs
 
-clear
-cd "$data_folder"
-use "sample"
+		clear
+		cd "$data_folder"
+		use "sample"
 
 /*
 eststo men: qui estpost sum ///
@@ -20,13 +20,13 @@ eststo insts: qui estpost sum ///
 esttab insts, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
 
 
-clear
-cd "$data_folder"
-use "sample_fe"
+		clear
+		cd "$data_folder"
+		use "sample_fe"
 
 
 
-set scheme white_tableau
+		set scheme white_tableau
 
 * count the number of authors and departments
 distinct author_id
@@ -35,20 +35,20 @@ distinct aff_inst_id
 * create tag for more period dynamic model
 egen author_global_class_tag = tag(author_id GLOBAL_CLASS)
 
-corr fe1_female fe2_female
-corr fe1_male fe2_male
+		corr fe1_female fe2_female
+		corr fe1_male fe2_male
 
-global percentiles = 4
+		global percentiles = 4
 
 
 *xtile pf = aif if female == 1, n($percentiles)
 *xtile pm = aif if female == 0, n($percentiles)
 
-xtile pf = fe1_female, n($percentiles)
-xtile pm = fe1_male, n($percentiles)
+		xtile pf = fe1_female, n($percentiles)
+		xtile pm = fe1_male, n($percentiles)
 
-bys pf:su fe1_female
-bys pm: su fe1_male
+		bys pf:su fe1_female
+		bys pm: su fe1_male
 
 
 capture drop sorting
@@ -85,23 +85,23 @@ keep female GLOBAL_CLASS fe1_female fe2_female fe1_male fe2_male pf pm
 export delimited using "python-graphs.csv", replace
 */
 
-bys GLOBAL_CLASS pm : egen numerator = nvals(author_id) if !missing(pm)
-bys GLOBAL_CLASS : egen denominator = nvals(author_id) if !missing(pm)
+		bys GLOBAL_CLASS pm : egen numerator = nvals(author_id) if !missing(pm)
+		bys GLOBAL_CLASS : egen denominator = nvals(author_id) if !missing(pm)
 
-bys GLOBAL_CLASS pf : egen numerator_f = nvals(author_id) if !missing(pf)
-bys GLOBAL_CLASS : egen denominator_f = nvals(author_id) if !missing(pf)
-replace numerator = numerator_f if missing(numerator)
-replace denominator = denominator_f if missing(denominator)
+		bys GLOBAL_CLASS pf : egen numerator_f = nvals(author_id) if !missing(pf)
+		bys GLOBAL_CLASS : egen denominator_f = nvals(author_id) if !missing(pf)
+		replace numerator = numerator_f if missing(numerator)
+		replace denominator = denominator_f if missing(denominator)
 
-gen share = numerator / denominator
+		gen share = numerator / denominator
 
-gen percentile = pm
-replace percentile = pf if percentile == .
+		gen percentile = pm
+		replace percentile = pf if percentile == .
 
-collapse (mean) share, by(GLOBAL_CLASS female percentile)
-drop if share == .
-reshape wide share, i(GLOBAL_CLASS female) j(percentile)
-graph bar share*, over(GLOBAL_CLASS) by(female) stack percent
+		collapse (mean) share, by(GLOBAL_CLASS female percentile)
+		drop if share == .
+		reshape wide share, i(GLOBAL_CLASS female) j(percentile)
+		graph bar share*, over(GLOBAL_CLASS) by(female) stack percent
 
 
 

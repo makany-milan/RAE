@@ -12,6 +12,9 @@ bys author_id: egen maxpubs_per_year = max(pubs_per_year)
 drop if maxpubs_per_year > 10
 */
 
+* Replace AIF to the average score if missing
+*replace aif = 1 if missing(aif)
+
 * Here we are taking the first aff_inst_id - this might casue some issues 
 
 collapse (first) aff_inst_id=aff_inst_id reltime=reltime female=female (sum) total_aif=aif total_top5=top5 (mean) avg_aif=aif (count) year_author_pubs=author2 (mean) avg_coauthors=number_of_authors, by(author_id year)
@@ -142,6 +145,15 @@ by author_id: gen total_exp_global_9 = sum(tmp_exp9)
 by author_id: gen total_exp_global_10 = sum(tmp_exp10)
 
 drop tmp_exp*
+
+
+* Infer gender for expanded observations
+gsort author_id female
+by author_id: replace female = female[1]
+
+* Replace quality equal to zero if no output is produced
+replace avg_aif = 0 if missing(avg_aif)
+replace total_aif = 0 if missing(total_aif)
 
 
 cd "$data_folder"

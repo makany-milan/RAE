@@ -1,4 +1,4 @@
-* 5b) Construct Classes
+* Construct Classes
 
 * potential improvements
 * use KNN for those that are in the bottom ranks to construct additional bins
@@ -26,10 +26,10 @@ drop _merge
 * generate regional rankings
 * qs starts binning above 150 - use THE as primary source
 gen global_rank_avg = (qs_econ_2021_rank + the_ec_rank) / 2 if !missing(qs_econ_2021_rank) & !missing(the_ec_rank) & qs_econ_2021_rank < 150
-replace global_rank_avg = qs_econ_2021_rank if missing(the_ec_rank)
-replace global_rank_avg = the_ec_rank if missing(qs_econ_2021_rank)
+replace global_rank_avg = the_ec_rank if missing(global_rank_avg)
 * fill the rest
-replace global_rank_avg = (qs_econ_2021_rank + the_ec_rank) / 2 if missing(global_rank_avg)
+replace global_rank_avg = (qs_econ_2021_rank + the_ec_rank) / 2 if missing(global_rank_avg) & !missing(qs_econ_2021_rank)  & !missing(the_ec_rank)
+replace global_rank_avg = qs_econ_2021_rank if missing(global_rank_avg)
 
 sort global_rank_avg
 gen global_rank = _n if !missing(global_rank_avg)
@@ -40,6 +40,10 @@ gen global_rank = _n if !missing(global_rank_avg)
 
 *
 * 10 global classes - percentiles
+
+* maybe keep only top 500 ?
+sort global_rank
+
 gen GLOBAL_CLASS = .
 la de glob_classes 1 "P10" 2 "P20" 3 "P30" 4 "P40" 5 "P50" 6 "P60" 7 "P70" 8 "P80" 9 "P90" 10 "P100"
 la val GLOBAL_CLASS glob_classes
