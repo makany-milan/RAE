@@ -12,12 +12,12 @@ eststo women: qui estpost sum ///
 	
 esttab men women, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
 */
-collapse (mean) prod top5s citations wcitations wtop5s wpubs avg_coauthors year_author_pubs female num_pubs , by(aff_inst_id)
+		collapse (mean) prod top5s citations wcitations wtop5s wpubs avg_coauthors year_author_pubs female num_pubs , by(aff_inst_id)
 
-eststo insts: qui estpost sum ///
-	 prod citations wcitations top5s year_author_pubs wpubs avg_coauthors female
-	
-esttab insts, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
+		eststo insts: qui estpost sum ///
+			 prod citations wcitations top5s year_author_pubs wpubs avg_coauthors female
+			
+		esttab insts, cells("mean(pattern(1 1 0) fmt(2)) sd(pattern(1 1 0)) t(pattern(0 0 1) par fmt(2))") tex
 
 
 		clear
@@ -51,15 +51,15 @@ egen author_global_class_tag = tag(author_id GLOBAL_CLASS)
 		bys pm: su fe1_male
 
 
-capture drop sorting
-gen sorting = .
-* store correlations for all quantiles
-foreach x of numlist 1/$percentiles {
-	corr fe1_female fe2_female if pf == `x'
-	replace sorting = `r(rho)' if pf ==`x' & female == 1
-	corr fe1_male fe2_male if pm == `x'
-	replace sorting = `r(rho)' if pm ==`x' & female == 0
-}
+		capture drop sorting
+		gen sorting = .
+		* store correlations for all quantiles
+		foreach x of numlist 1/$percentiles {
+			corr fe1_female fe2_female if pf == `x'
+			replace sorting = `r(rho)' if pf ==`x' & female == 1
+			corr fe1_male fe2_male if pm == `x'
+			replace sorting = `r(rho)' if pm ==`x' & female == 0
+		}
 
 
 
