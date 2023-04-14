@@ -7,8 +7,10 @@
 
 clear
 clear programs
+* disable variable abbreviations
 set varabbrev off, permanently
-
+* set seed for random number generation - replication purposes
+set seed 2048873
 
 /*
 * Install packages

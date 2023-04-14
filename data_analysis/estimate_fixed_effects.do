@@ -53,10 +53,15 @@ while abs(`dif')>epsdouble() {
 display "Total Number of Iterations --> `i'"
 display "R-SQUARED: `e(r2)'"
 
+
+predict fem_prod, xb
+predict fem_prod_se, stdp
+
 rename fe1 fe1_female
 rename fe2 fe2_female
 replace fe1_female = . if female == 0
 replace fe2_female = . if female == 0
+
 
 
 
@@ -79,7 +84,7 @@ local i=0
 
 while abs(`dif')>epsdouble() {
 	quietly {
-		regress y fe1 fe2  total_exp_*
+		regress y fe1 fe2 total_exp_*
 		local rss2=`rss1'
 		local rss1=e(rss)
 		local dif=`rss2'-`rss1'
@@ -102,12 +107,21 @@ while abs(`dif')>epsdouble() {
 display "Total Number of Iterations --> `i'"
 display "R-SQUARED: `e(r2)'"
 
+predict male_prod, xb
+predict male_prod_se, stdp
+
 rename fe1 fe1_male
 rename fe2 fe2_male
 replace fe1_male = . if female == 1
 replace fe2_male = . if female == 1
+
 */
 
+
+replace fe1_female = . if missing(female)
+replace fe2_female = . if missing(female)
+replace fe1_male = . if missing(female)
+replace fe2_male = . if missing(female)
 
 cd "$data_folder"
 save sample_fe, replace
