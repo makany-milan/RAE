@@ -53,5 +53,5 @@ forvalues x = 1/10 {
 	replace male_exp_global_`x' = 0 if female == 1
 }
 
-areg avg_aif total_exp_* fem_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)
-areg avg_aif total_exp_* male_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)
+areg avg_aif total_exp_* fem_exp_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)
+areg avg_aif total_exp_* male_exp_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)

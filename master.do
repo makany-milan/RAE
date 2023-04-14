@@ -255,7 +255,7 @@ global data_folder = "G:\My Drive\RAE"
 
 * ==============================================================================
 
-*/
+
 
 * 4) Construct a panel of authors and departments
 * ==============================================================================
@@ -301,7 +301,6 @@ global data_folder = "G:\My Drive\RAE"
 
 
 
-
 * 5) Analysis
 * ==============================================================================
 
@@ -321,7 +320,9 @@ global data_folder = "G:\My Drive\RAE"
 
 * 5c) Estimate the models
 	cd "$scripts_folder"
-	do "data_analysis/estimate_fixed_effects.do" 
+	do "data_analysis/estimate_fixed_effects.do"
+	
+*/
 	
 * 5d) Generate summary statistics and descriptive graphs
 	cd "$scripts_folder"
