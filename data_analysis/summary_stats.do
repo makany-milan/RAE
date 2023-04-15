@@ -17,7 +17,7 @@ use "sample"
 collapse (mean) year_author_pubs avg_aif total_aif, by(GLOBAL_CLASS)
 
 twoway (connected year_author_pubs GLOBAL_CLASS) (connected avg_aif GLOBAL_CLASS), title("Average Research Quality & Quantity by Department Class") ylabel(0(0.2)1.2) xlabel(#10, valuelabel) ytitle("") xtitle("") legend(ring(0) label(1 "Quantity") label(2 "Quality")) name("quant_qual", replace)
-graph export "$data_folder\graphs\avg_research_qual_quant_class.png", as(png) name("quant_qual", replace)
+graph export "$data_folder\graphs\avg_research_qual_quant_class.png", as(png) name("quant_qual") replace
 
 
 * By class and gender
