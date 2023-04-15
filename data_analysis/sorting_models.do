@@ -57,7 +57,7 @@ replace fe2 = fe2_male if female == 0
 gen prod = fem_prod
 replace prod = male_prod if female == 0
 
-ttest prod, by(female) uneq
+ttest prod if author_global_class_tag, by(female) uneq
 
 * counterfactual 1) women have the same department fixed effects as men
 gen cf_fe2 = fe2_male
@@ -66,7 +66,8 @@ bys GLOBAL_CLASS: replace cf_fe2 = cf_fe2[1]
 
 gen cf_prod = prod - fe2 + cf_fe2
 
-ttest cf_prod, by(female) uneq
+ttest cf_prod if author_global_class_tag, by(female) uneq
+
 * the mean for women is actually smaller
 * informative in a policy sense? think more about this - include ?
 
@@ -79,11 +80,11 @@ ttest cf_prod, by(female) uneq
 mat probs_male = J($percentiles, 10, .)
 foreach y of numlist 1/$percentiles {
 	* count total men in a given type
-	qui: count if pm == `y'
+	qui: count if pm == `y' & author_global_class_tag
 	local total_intype = `r(N)'
 	* fill matrix with relevant probabilities
 	foreach x of numlist 1/10{
-		qui: count if pm == `y' & GLOBAL_CLASS == `x'
+		qui: count if pm == `y' & GLOBAL_CLASS == `x' & author_global_class_tag
 		local type_inclass = `r(N)'
 		local val = `type_inclass' / `total_intype'
 		mat probs_male[`y', `x'] =  `val'
@@ -94,11 +95,11 @@ foreach y of numlist 1/$percentiles {
 mat probs_female = J($percentiles, 10, .)
 foreach y of numlist 1/$percentiles {
 	* count total men in a given type
-	qui: count if pf == `y'
+	qui: count if pf == `y' & author_global_class_tag
 	local total_intype = `r(N)'
 	* fill matrix with relevant probabilities
 	foreach x of numlist 1/10{
-		qui: count if pf == `y' & GLOBAL_CLASS == `x'
+		qui: count if pf == `y' & GLOBAL_CLASS == `x' & author_global_class_tag
 		local type_inclass = `r(N)'
 		local val = `type_inclass' / `total_intype'
 		mat probs_female[`y', `x'] =  `val'
@@ -115,11 +116,11 @@ plotmatrix, mat(top_types) legend(off)
 mat cum_probs_female = J($percentiles, 10, .)
 foreach y of numlist 1/$percentiles {
 	* count total men in a given type
-	qui: count if pf == `y'
+	qui: count if pf == `y' & author_global_class_tag
 	local total_intype = `r(N)'
 	* fill matrix with relevant probabilities
 	foreach x of numlist 1/10{
-		qui: count if pf == `y' & GLOBAL_CLASS == `x'
+		qui: count if pf == `y' & GLOBAL_CLASS == `x' & author_global_class_tag
 		local type_inclass = `r(N)'
 		local val = `type_inclass' / `total_intype'
 		if `x' == 1 {
@@ -136,11 +137,11 @@ foreach y of numlist 1/$percentiles {
 mat cum_probs_male = J($percentiles, 10, .)
 foreach y of numlist 1/$percentiles {
 	* count total men in a given type
-	qui: count if pm == `y'
+	qui: count if pm == `y' & author_global_class_tag
 	local total_intype = `r(N)'
 	* fill matrix with relevant probabilities
 	foreach x of numlist 1/10{
-		qui: count if pm == `y' & GLOBAL_CLASS == `x'
+		qui: count if pm == `y' & GLOBAL_CLASS == `x' & author_global_class_tag
 		local type_inclass = `r(N)'
 		local val = `type_inclass' / `total_intype'
 		if `x' == 1 {
@@ -154,55 +155,222 @@ foreach y of numlist 1/$percentiles {
 	}
 }
 
+ 
+* store fixed effects for men and women
+egen class_female_tag = tag(GLOBAL_CLASS female)
+
+mat male_fe = J(1, 10, .)
+foreach glob_class of numlist 1/10 {
+	qui: su fe2 if female == 0 & GLOBAL_CLASS == `glob_class' & class_female_tag
+	mat male_fe[1, `glob_class'] = `r(mean)'
+}
+mat female_fe = J(1, 10, .)
+foreach glob_class of numlist 1/10 {
+	qui: su fe2 if female == 1 & GLOBAL_CLASS == `glob_class' & class_female_tag
+	mat female_fe[1, `glob_class'] = `r(mean)'
+}
 
 
-capture program drop simulate_counterfactual
-program simulate_counterfactual, eclass
+local iters = 20
+mat diffs = J(3, `iters', .)
+
+* keeping fixed effects the same for genders
+nois _dots 0, title(Generating counterfactulas) reps(`iters')
+foreach x of numlist 1/`iters'{
 	quietly {
+		* ========== COUNTERFACTUAL 1: SAME SORTING, DIFFERENT FE
 		* generate new counterfactual class and productivity variables
 		* observe new gender gap
 		capture drop cf_prod
 		capture drop cf_class
 		capture drop rand
+		capture drop cf_prod
+		capture drop cf_fe2
 		gen cf_prod = .
 		gen cf_class = .
 		* decision
 		* set counterfactual at author or observation level
-		* current count is at observation level - continue to do that way
+		* do at author - class level
+	
 		*bys author_id: gen rand =  runiform()
 		gen rand = runiform()
+		* keep first random value
+		bys author_id GLOBAL_CLASS (year): replace rand = rand[1]
 		foreach pers_type of numlist 1/$percentiles {
 			foreach glob_class of numlist 1/10 {
 				if `glob_class' == 10 {
 					* if it hasnt been classified yet and fits the type group that means assign to group 10
-					replace cf_class = 10 if female == 1 & pf == `pers_type' & missing(cf_class)
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 1 & pf == `pers_type' & missing(cf_class)
 				}
 				else {
-					replace cf_class = `glob_class' if female == 1 & `pers_type' == pf & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 1 & `pers_type' == pf & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
 				}
 				
 			}
 		}	
 		* same randomisation for men ?
+		*replace cf_class = GLOBAL_CLASS if female == 0
+		
 		foreach pers_type of numlist 1/$percentiles {
 			foreach glob_class of numlist 1/10 {
 				if `glob_class' == 10 {
 					* if it hasnt been classified yet and fits the type group that means assign to group 10
-					replace cf_class = 10 if female == 0 & pm == `pers_type' & missing(cf_class)
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 0 & pm == `pers_type' & missing(cf_class)
 				}
 				else {
-					replace cf_class = `glob_class' if female == 0 & `pers_type' == pm & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 0 & `pers_type' == pm & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
+				}
+				
+			}
+		}
+		
+		* generate counterfactual productivity
+		replace cf_prod = prod - fe2 + male_fe[1, cf_class] if female == 0
+		replace cf_prod = prod - fe2 + female_fe[1, cf_class] if female == 1	
+		
+		* compare output gap
+		ttest cf_prod, by(female)
+		local cf_diff = `r(mu_1)' - `r(mu_2)'
+		mat diffs[2, `x'] = `cf_diff'
+		
+		
+		* ========== COUNTERFACTUAL 2: SAME SORTING, SAME FE
+		* generate new counterfactual class and productivity variables
+		* observe new gender gap
+		capture drop cf_prod
+		capture drop cf_class
+		capture drop rand
+		capture drop cf_prod
+		capture drop cf_fe2
+		gen cf_prod = .
+		gen cf_class = .
+		* decision
+		* set counterfactual at author or observation level
+		* do at author - class level
+	
+		*bys author_id: gen rand =  runiform()
+		gen rand = runiform()
+		* keep first random value
+		bys author_id GLOBAL_CLASS (year): replace rand = rand[1]
+		foreach pers_type of numlist 1/$percentiles {
+			foreach glob_class of numlist 1/10 {
+				if `glob_class' == 10 {
+					* if it hasnt been classified yet and fits the type group that means assign to group 10
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 1 & pf == `pers_type' & missing(cf_class)
+				}
+				else {
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 1 & `pers_type' == pf & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
 				}
 				
 			}
 		}	
+		* same randomisation for men ?
+		*replace cf_class = GLOBAL_CLASS if female == 0
+		
+		foreach pers_type of numlist 1/$percentiles {
+			foreach glob_class of numlist 1/10 {
+				if `glob_class' == 10 {
+					* if it hasnt been classified yet and fits the type group that means assign to group 10
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 0 & pm == `pers_type' & missing(cf_class)
+				}
+				else {
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 0 & `pers_type' == pm & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
+				}
+				
+			}
+		}
+		
+		* generate counterfactual productivity
+		replace cf_prod = prod - fe2 + male_fe[1, cf_class] if female == 0
+		replace cf_prod = prod - fe2 + male_fe[1, cf_class] if female == 1	
+		
+		* compare output gap
+		ttest cf_prod, by(female)
+		local cf_diff = `r(mu_1)' - `r(mu_2)'
+		mat diffs[3, `x'] = `cf_diff'
+		
+		
+		* ========== ORIGINAL SIMULATED: DIFFERENT SORTING, DIFFERENT FE
+		* now do the same simulation with original distributions
+		* generate new counterfactual class and productivity variables
+		* observe new gender gap
+		capture drop cf_prod
+		capture drop cf_class
+		capture drop rand
+		capture drop cf_prod
+		capture drop cf_fe2
+		gen cf_prod = .
+		gen cf_class = .
+		* decision
+		* set counterfactual at author or observation level
+		* do at author - class level
+	
+		*bys author_id: gen rand =  runiform()
+		gen rand = runiform()
+		* keep first random value
+		bys author_id GLOBAL_CLASS (year): replace rand = rand[1]
+		foreach pers_type of numlist 1/$percentiles {
+			foreach glob_class of numlist 1/10 {
+				if `glob_class' == 10 {
+					* if it hasnt been classified yet and fits the type group that means assign to group 10
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 1 & pf == `pers_type' & missing(cf_class)
+				}
+				else {
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 1 & `pers_type' == pf & missing(cf_class) & rand < cum_probs_female[`pers_type', `glob_class']
+				}
+				
+			}
+		}	
+		* same randomisation for men ?
+		*replace cf_class = GLOBAL_CLASS if female == 0
+		
+		foreach pers_type of numlist 1/$percentiles {
+			foreach glob_class of numlist 1/10 {
+				if `glob_class' == 10 {
+					* if it hasnt been classified yet and fits the type group that means assign to group 10
+					bys author_id GLOBAL_CLASS: replace cf_class = 10 if female == 0 & pm == `pers_type' & missing(cf_class)
+				}
+				else {
+					bys author_id GLOBAL_CLASS: replace cf_class = `glob_class' if female == 0 & `pers_type' == pm & missing(cf_class) & rand < cum_probs_male[`pers_type', `glob_class']
+				}
+				
+			}
+		}
+		
+		
+		* generate counterfactual productivity
+		replace cf_prod = prod - fe2 + male_fe[1, cf_class] if female == 0
+		replace cf_prod = prod - fe2 + male_fe[1, cf_class] if female == 1	
+		
+		* compare output gap
+		ttest cf_prod, by(female)
+		local cf_diff = `r(mu_1)' - `r(mu_2)'
+		mat diffs[1, `x'] = `cf_diff'
 	}
-end
+	nois _dots `x' 0
+}
 
-* compare output gap
-ttest prod, by(female)
-ttest cf_prod, by(female)
 
+
+* transpose for svmat
+matrix diffs_t = diffs'
+clear
+svmat diffs_t, names(sim)
+* reshape array
+
+gen simid = _n
+reshape long sim, i(simid) j(cf)
+* cf: 0 - original
+* cf: 1 - same sorting different fe
+* cf: 2 - same sorting same fe
+
+collapse (mean) avg=sim (semean) sd=sim, by(cf)
+
+*generate upper and lower ci
+gen gap_u = avg + 1.96*sd
+gen gap_l = avg - 1.96*sd
+
+twoway (scatter avg cf) (rcap gap_u gap_l cf)
 
 * sorting graphs
 *bys pf:su fe1_female
