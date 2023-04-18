@@ -15,9 +15,6 @@ replace fe2_male = . if missing(female)
 areg avg_aif b5.GLOBAL_CLASS, absorb(author_id) cluster(author_id)
 
 
-set scheme white_tableau
-
-
 
 * create tag for more period dynamic model
 egen author_global_class_tag = tag(author_id GLOBAL_CLASS)

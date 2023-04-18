@@ -11,6 +11,8 @@ clear programs
 set varabbrev off, permanently
 * set seed for random number generation - replication purposes
 set seed 2048873
+* set scheme for graphs
+set scheme white_tableau
 
 /*
 * Install packages

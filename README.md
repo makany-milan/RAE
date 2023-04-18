@@ -17,6 +17,8 @@ The codes in the repository are used by the author to extract, process, and anal
 | [Web of Science Master Journal List](https://mjl.clarivate.com/collection-list-downloads) | The Master Journal List is an invaluable tool to help you to find the right journal for your needs across multiple indices hosted on the Web of Science platform.|
 | [Web of Science Journal Citation Reports](https://jcr.clarivate.com/jcr/browse-journals) | The Journal Citation Reports provides data on Journal Article Influence Scores and Journal Impact factor. This data can be useful to construct a measure of publication quality.|
 | [EconLit](https://www.aeaweb.org/econlit/journal_list.php) | EconLit provides the coverage most needed by scholars to make new discoveries, develop important insights, and contribute valuable research to the economics community.|
+| [Scopus](https://www.scopus.com/sources.uri) | Scopus is a large, multidisciplinary database of peer-reviewed literature: scientific journals, books, and conference proceedings |
+| [scimagojr](https://www.scimagojr.com/) | Metrics based on Scopus, maybe some additional matches? |
 | **Gender Data** |
 | [Social Security Administration](https://www.ssa.gov/oact/babynames/) | The Social Security Administration (SSA) collects names of babies born the United States since 1879 |
 | [World Gender Name Dictionary ](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MSEGSJ) | This paper revisits the first World Gender Name Dictionary (WGND 1.0), allowing to disambiguate the gender in data naming physical persons (Lax Martínez et al., 2016). |
