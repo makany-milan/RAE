@@ -61,6 +61,32 @@ twoway (connected year_author_pubs GLOBAL_CLASS if female == 1, color(red) lpatt
 graph export "$data_folder\graphs\avg_research_qual_quant_gender_class.png", as(png) name("quant_qual_gender") replace
 
 
+
+clear
+cd "$data_folder"
+use "sample"
+
+*keep if inrange(year, 2000 , 2020)
+collapse (mean) year_author_pubs avg_aif total_aif female, by(GLOBAL_CLASS year)
+
+twoway (connected female year if GLOBAL_CLASS == 1) (connected female year if GLOBAL_CLASS == 3) (connected female year if GLOBAL_CLASS == 5) ///
+		(connected female year if GLOBAL_CLASS == 10), legend(label(1 "Class P10") label(2 "Class P30") label(3 "Class P50") label(4 "Class P100")) ///
+       legend(order(1 3 2 4)) ytitle("Share of women") name("share_of_women_by_class", replace)
+graph export "$data_folder\graphs\share_of_women_by_class.png", as(png) name("share_of_women_by_class") replace
+
+
+clear
+cd "$data_folder"
+use "sample"
+
+keep if inrange(year, 2000 , 2020)
+collapse (mean) year_author_pubs avg_aif total_aif female, by(GLOBAL_CLASS)
+
+twoway (connected female GLOBAL_CLASS)
+graph export "$data_folder\graphs\share_of_women_by_class.png", as(png) name("share_of_women_by_class") replace
+
+
+
 * By REGION_CLASS
 /*
 clear

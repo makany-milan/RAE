@@ -202,7 +202,7 @@ use "temp/temp_sorting"
 * delete
 *rm "temp/temp_sorting.dta"
 
-local iters = 20
+local iters = 200
 * 4 rows - 1 for the original, 3 for counterfactuals
 mat diffs = J(4, `iters', .)
 
@@ -475,7 +475,7 @@ twoway (scatter avg cf if cf == 1, color(red)) (rcap gap_u gap_l cf if cf == 1, 
 */
 		
 * use quantiles - makes more sense, also used by Giulia
-* ci via p5-p95 quantiles
+* ci via p10-p90 percentiles
 twoway (scatter avg cf if cf == 1, color(red)) (rcap p5 p95 cf if cf == 1, color(red)) ///
 		(scatter avg cf if cf != 1, color(blue)) (rcap p5 p95 cf if cf != 1, color(blue)), ///
 		xlabel(1 "Original sorting & class FE" 2 "Original sorting & counterfactual class FE" 3 "Counterfactual sorting & original class FE" 4 "Counterfactual sorting & class FE", labs(small) alt) ///
