@@ -15,7 +15,6 @@ replace fe2_male = . if missing(female)
 areg avg_aif b5.GLOBAL_CLASS, absorb(author_id) cluster(author_id)
 
 
-
 * create tag for more period dynamic model
 egen author_global_class_tag = tag(author_id GLOBAL_CLASS)
 
@@ -41,7 +40,10 @@ foreach x of numlist 1/$percentiles {
 	replace sorting = `r(rho)' if pm ==`x' & female == 0
 }
 
-twoway (scatter sorting pm if female == 0, color(blue)) (scatter sorting pf if female == 1, color(red))
+egen pf_tag = tag(pf)
+egen pm_tag = tag(pm)
+twoway (scatter sorting pm if female == 0 & pm_tag, color(blue)) (scatter sorting pf if female == 1 & pf_tag, color(red)), legend(off) ytitle("Sorting Correlation") xlabel(1 "Type 1"  2 "Type 2"  3 "Type 3"  4 "Type 4"  5 "Type 5" ) name("sorting_scatter", replace)
+graph export "$data_folder\graphs\sorting_scatter.png", as(png) name("sorting_scatter") replace
 
 * develop counterfactual scenarios
 
@@ -107,7 +109,9 @@ foreach y of numlist 1/$percentiles {
 * stack male female top types
 mat top_types = probs_male[$percentiles, 1..10] \ probs_female[$percentiles, 1..10]
 * this also gives us a way to visualise probabilities
-plotmatrix, mat(top_types) legend(off)
+plotmatrix, mat(top_types) legend(off) c(dimgray)  xlabel(1 "P10" 2 "P20" 3 "P30" 4 "P40" 5 "P50" 6 "P60" 7 "P70" 8 "P80" 9 "P90" 10 "P100",nogrid) ///
+			ylabel(0 "Male" -1 "Female",nogrid) name("dist_top_type", replace)
+graph export "$data_folder\graphs\dist_top_type.png", as(png) name("dist_top_type") replace
 
 * create new matrix with cumulative probabilities for women
 mat cum_probs_female = J($percentiles, 10, .)
@@ -152,6 +156,7 @@ foreach y of numlist 1/$percentiles {
 	}
 }
 
+
  
 * store fixed effects for men and women
 egen class_female_tag = tag(GLOBAL_CLASS female)
@@ -186,6 +191,7 @@ gen share = numerator / denominator
 gen percentile = pm
 replace percentile = pf if percentile == .
 
+/*
 * save temporary file before collapse
 cd "$data_folder"
 capture mkdir temp
@@ -196,13 +202,17 @@ drop if share == .
 reshape wide share, i(GLOBAL_CLASS female) j(percentile)
 graph bar share*, over(GLOBAL_CLASS) by(female) stack percent
 
+
 * reload temp file
 clear
 use "temp/temp_sorting"
 * delete
 *rm "temp/temp_sorting.dta"
 
-local iters = 200
+*/
+
+
+local iters = 250
 * 4 rows - 1 for the original, 3 for counterfactuals
 mat diffs = J(4, `iters', .)
 
@@ -462,6 +472,9 @@ reshape long sim, i(simid) j(cf)
 * by random assignment of classes
 collapse (mean) avg=sim (semean) sd=sim (p5) p5=sim (p95) p95=sim, by(cf)
 
+* reduction in gender gap
+di ( avg[4] - avg[1] )/ avg[1]
+
 *generate upper and lower ci
 gen gap_u = avg + 1.96*sd
 gen gap_l = avg - 1.96*sd
@@ -479,8 +492,73 @@ twoway (scatter avg cf if cf == 1, color(red)) (rcap gap_u gap_l cf if cf == 1, 
 twoway (scatter avg cf if cf == 1, color(red)) (rcap p5 p95 cf if cf == 1, color(red)) ///
 		(scatter avg cf if cf != 1, color(blue)) (rcap p5 p95 cf if cf != 1, color(blue)), ///
 		xlabel(1 "Original sorting & class FE" 2 "Original sorting & counterfactual class FE" 3 "Counterfactual sorting & original class FE" 4 "Counterfactual sorting & class FE", labs(small) alt) ///
-		xtitle("") legend(off) xscale(range(0.5 4.5)) title("Gender gap under counterfactual scenarios") name("counterfactuals", replace)
+		xtitle("") legend(off) xscale(range(0.5 4.5)) title("") name("counterfactuals", replace)
 
 graph export "$data_folder\graphs\counterfactuals.png", as(png) name("counterfactuals") replace
 
+cd "$data_folder"
+save "sim_results", replace
 
+/*
+clear
+cd "$data_folder"
+use "sample_fe_inst"
+	
+capture drop author_inst_tag
+egen author_inst_tag = tag(author_id aff_inst_id)
+
+* histogram and ttest of FEs
+capture drop inst_lvl_fe2
+gen inst_lvl_fe2 = inst_lvl_fe1_female
+replace inst_lvl_fe2 = inst_lvl_fe2_male if female == 0
+twoway (hist inst_lvl_fe2 if female == 1 & author_inst_tag == 1, bin(50) color(red%60)) (hist inst_lvl_fe2 if female == 0, bin(50) color(blue%60) ), legend(off) ytitle("") xtitle(Department Fixed Effects) name("deptfes", replace)
+graph export "$data_folder\graphs\dept_fe.png", as(png) name("deptfes") replace
+
+cls
+* variance decomposition
+su total_aif if female == 1
+local fem_var = `r(Var)'
+di `r(Var)'
+su avg_aif if female == 0
+local male_var = `r(Var)'
+di `r(Var)'
+cor inst_lvl_fe1_female inst_lvl_fe2_female, cov
+local fe1_var = r(C)[1,1]
+local fe1_var = `fe1_var' / `fem_var'
+local fe2_var = r(C)[2,2]
+local fe2_var = `fe2_var' / `fem_var'
+di "% explained by variation in fe1: `fe1_var'"
+di "% explained by variation in fe2: `fe2_var'"
+cor inst_lvl_fe1_male inst_lvl_fe2_male, cov
+local fe1_var = r(C)[1,1]
+local fe1_var = `fe1_var' / `male_var'
+local fe2_var = r(C)[2,2]
+local fe2_var = `fe2_var' / `male_var'
+di "% explained by variation in fe1: `fe1_var'"
+di "% explained by variation in fe2: `fe2_var'"
+
+* same with class FEs
+cls
+* variance decomposition
+su total_aif if female == 1
+local fem_var = `r(Var)'
+di `r(Var)'
+su avg_aif if female == 0
+local male_var = `r(Var)'
+di `r(Var)'
+cor fe1_female fe2_female, cov
+local fe1_var = r(C)[1,1]
+local fe1_var = `fe1_var' / `fem_var'
+local fe2_var = r(C)[2,2]
+local fe2_var = `fe2_var' / `fem_var'
+di "% explained by variation in fe1: `fe1_var'"
+di "% explained by variation in fe2: `fe2_var'"
+cor fe1_male fe2_male, cov
+local fe1_var = r(C)[1,1]
+local fe1_var = `fe1_var' / `male_var'
+local fe2_var = r(C)[2,2]
+local fe2_var = `fe2_var' / `male_var'
+di "% explained by variation in fe1: `fe1_var'"
+di "% explained by variation in fe2: `fe2_var'"
+
+*/

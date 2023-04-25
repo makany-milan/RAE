@@ -66,7 +66,6 @@ forvalues x = 1/10 {
 }
 
 areg avg_aif total_exp_* fem_exp_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)
-areg avg_aif total_exp_* male_exp_* b5.GLOBAL_CLASS if year > 2000, absorb(author_id) cluster(author_id)
 
 coefplot, omit base keep(total_exp*) xline(0)
-coefplot, omit base keep(male_exp*) xline(0)
+coefplot, omit base keep(female_exp*) xline(0)

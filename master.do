@@ -41,11 +41,11 @@ global data_folder = "D:\GoogleDrive\RAE"
 */
 
 *
-/* laptop
+* laptop
 global scripts_folder = "C:\Users\Milan\OneDrive\Desktop\RAE"
 global data_folder = "G:\My Drive\RAE"
 */
-*
+/*
 * Procedure Outline
 * 1) Data Collection
 *	Get publication of all potential economists based on publications in 
@@ -99,7 +99,7 @@ global data_folder = "G:\My Drive\RAE"
 *	5d) Generate summary statistics and descriptive graphs
 
 
-/*
+*
 
 * 1) Data Collection
 * ==============================================================================
@@ -259,8 +259,7 @@ global data_folder = "G:\My Drive\RAE"
 
 * ==============================================================================
 
-*/
-	
+
 
 * 4) Construct a panel of authors and departments
 * ==============================================================================
@@ -304,7 +303,8 @@ global data_folder = "G:\My Drive\RAE"
 * ==============================================================================
 
 
-
+*/
+	
 
 * 5) Analysis
 * ==============================================================================

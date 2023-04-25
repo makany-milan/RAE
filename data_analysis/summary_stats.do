@@ -6,7 +6,7 @@ clear
 cd "$data_folder"
 use "sample"
 
-keep if inrange(year, 2000, 2020)
+keep if inrange(year, 1980, 2020)
 keep if !missing(female)
 
 * Quality and quantity metrics
@@ -106,7 +106,7 @@ clear
 cd "$data_folder"
 use "sample"
 
-keep in inrange(year, 2000, 2020)
+keep if inrange(year, 2000, 2020)
 keep if !missing(female)
 
 collapse (mean) year_author_pubs avg_aif total_aif, by(female)

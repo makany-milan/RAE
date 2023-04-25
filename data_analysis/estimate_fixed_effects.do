@@ -1,9 +1,14 @@
-* Estimate models
 
 clear
 cd "$data_folder"
 use "sample"
 
+
+* generate lagged variable for experience
+gsort author_id +year
+foreach x of numlist 1/10 {
+	by author_id: gen l1_total_exp_global_`x' = total_exp_global_`x'[_n-1]
+}
 
 * For the estimation of high dimensional fixed effects we can use the zigzag estimator.
 * Guimarães, P., Portugal, P., 2010A Simple Feasible Procedure to fit Models with High-dimensional Fixed EffectsThe Stata Journal 10, 628–649 https://doi.org/10.1177/1536867X1101000406
@@ -16,7 +21,7 @@ capture drop y
 capture drop temp 
 capture drop fe1 fe2
 
-gen y = total_aif  if female == 1
+gen y = avg_aif if female == 1
 
 generate double temp=0 if female == 1
 generate double fe1=0 if female == 1
@@ -27,10 +32,11 @@ local dif=1
 local i=0
 
 * demean variables
+* 
 
 while abs(`dif')>epsdouble() {
 	quietly {
-		regress y fe1 fe2 total_exp_*
+		regress y fe1 fe2 l1_total_exp_global_*
 		local rss2=`rss1'
 		local rss1=e(rss)
 		local dif=`rss2'-`rss1'
@@ -70,7 +76,7 @@ capture drop y
 capture drop temp 
 capture drop fe1 fe2
 
-gen y = total_aif  if female == 0
+gen y = avg_aif if female == 0
 
 generate double temp=0 if female == 0
 generate double fe1=0 if female == 0
@@ -84,7 +90,7 @@ local i=0
 
 while abs(`dif')>epsdouble() {
 	quietly {
-		regress y fe1 fe2 total_exp_*
+		regress y fe1 fe2 l1_total_exp_global_*
 		local rss2=`rss1'
 		local rss1=e(rss)
 		local dif=`rss2'-`rss1'
@@ -126,11 +132,14 @@ replace fe2_male = . if missing(female)
 cd "$data_folder"
 save sample_fe, replace
 
+
+/*
+
 * same with institution level fixed effects
 capture drop y
 capture drop temp 
 capture drop fe1 fe2
-gen y = total_aif  if female == 1
+gen y = avg_aif  if female == 1
 
 generate double temp=0 if female == 1
 generate double fe1=0 if female == 1
@@ -144,7 +153,7 @@ local i=0
 
 while abs(`dif')>epsdouble() {
 	quietly {
-		regress y fe1 fe2 total_exp_*
+		regress y fe1 fe2 l1_total_exp_global_*
 		local rss2=`rss1'
 		local rss1=e(rss)
 		local dif=`rss2'-`rss1'
@@ -158,7 +167,7 @@ while abs(`dif')>epsdouble() {
 		egen double fe2=mean(temp), by(aff_inst_id)
 		local i=`i'+1
 		
-		if mod(`i', 50) == 0{
+		if mod(`i', 100) == 0{
 				noisily: di "Iteration `i' - dif = `dif'"
 		}
 	}
@@ -184,7 +193,7 @@ capture drop y
 capture drop temp 
 capture drop fe1 fe2
 
-gen y = total_aif  if female == 0
+gen y = avg_aif  if female == 0
 
 generate double temp=0 if female == 0
 generate double fe1=0 if female == 0
@@ -198,7 +207,7 @@ local i=0
 
 while abs(`dif')>epsdouble() {
 	quietly {
-		regress y fe1 fe2 total_exp_*
+		regress y fe1 fe2 l1_total_exp_global_*
 		local rss2=`rss1'
 		local rss1=e(rss)
 		local dif=`rss2'-`rss1'
@@ -212,7 +221,7 @@ while abs(`dif')>epsdouble() {
 		egen double fe2=mean(temp), by(aff_inst_id)
 		local i=`i'+1
 		
-		if mod(`i', 50) == 0{
+		if mod(`i', 100) == 0{
 				noisily: di "Iteration `i' - dif = `dif'"
 		}
 	}
@@ -229,7 +238,7 @@ rename inst_lvl_fe2 fe2_male
 replace inst_lvl_fe1_male = . if female == 1
 replace inst_lvl_fe2_male = . if female == 1
 
-*/
+
 
 
 replace inst_lvl_fe1_female = . if missing(female)
@@ -239,5 +248,6 @@ replace inst_lvl_fe2_male = . if missing(female)
 
 
 cd "$data_folder"
-save sample_fe, replace
+save sample_fe_inst, replace
 
+*/
