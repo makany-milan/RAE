@@ -18,9 +18,9 @@ format aff_inst_id %12.0g
 	keep if inrange(year, 1980, 2020)
 
 * Restrict the type of institutions
-	* keep if institution has at least 15 active authors in the timeframe
+	* keep if institution has at least 10 active authors in the timeframe
 	bys aff_inst_id: egen inst_total_authors_post00 = nvals(author_id)
-	replace aff_inst_id = . if inst_total_authors_post00 < 15
+	replace aff_inst_id = . if inst_total_authors_post00 < 10
 
 	* here some authors will have empty observations
 	* if there are a few simply infer affiliation there - small lab or miscoded
