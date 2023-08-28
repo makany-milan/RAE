@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# cluster log and output files
+*.log
+*.out
+
 # C extensions
 *.so
 
@@ -127,3 +131,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
